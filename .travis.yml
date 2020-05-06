@@ -97,7 +97,7 @@ deploy:
   # tagged releases from master, go to distribution
   - provider: script
     skip_cleanup: true
-    script: "bash scripts/deploy-artifactory.sh 'eosiojavaandroidabieosserializationprovider-product-eosio-dist'" 
+    script: "bash scripts/deploy-artifactory.sh 'arisenjavaandroidabirixserializationprovider-product-arisen-dist'" 
     on:
       tags: true
       branch: master
