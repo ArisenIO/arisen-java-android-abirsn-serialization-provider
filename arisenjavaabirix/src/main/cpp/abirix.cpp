@@ -1,15 +1,15 @@
-// copyright defined in abirix/LICENSE.txt
+// copyright defined in ABIRSN/LICENSE.txt
 
-#include "abirix.h"
-#include "abirix.hpp"
+#include "ABIRSN.h"
+#include "ABIRSN.hpp"
 
 #include <memory>
 
 inline const bool catch_all = true;
 
-using namespace abirix;
+using namespace ABIRSN;
 
-struct abirix_context_s {
+struct ABIRSN_context_s {
     const char* last_error = "";
     std::string last_error_buffer{};
     std::string result_str{};
@@ -23,14 +23,14 @@ void fix_null_str(const char*& s) {
         s = "";
 }
 
-bool set_error(abirix_context* context, std::string error) noexcept {
+bool set_error(ABIRSN_context* context, std::string error) noexcept {
     context->last_error_buffer = std::move(error);
     context->last_error = context->last_error_buffer.c_str();
     return false;
 }
 
 template <typename T, typename F>
-auto handle_exceptions(abirix_context* context, T errval, F f) noexcept -> decltype(f()) {
+auto handle_exceptions(ABIRSN_context* context, T errval, F f) noexcept -> decltype(f()) {
     if (!context)
         return errval;
     try {
@@ -48,9 +48,9 @@ auto handle_exceptions(abirix_context* context, T errval, F f) noexcept -> declt
     }
 }
 
-extern "C" abirix_context* abirix_create() {
+extern "C" ABIRSN_context* ABIRSN_create() {
     try {
-        return new abirix_context{};
+        return new ABIRSN_context{};
     } catch (...) {
         if (!catch_all)
             throw;
@@ -58,27 +58,27 @@ extern "C" abirix_context* abirix_create() {
     }
 }
 
-extern "C" void abirix_destroy(abirix_context* context) { delete context; }
+extern "C" void ABIRSN_destroy(ABIRSN_context* context) { delete context; }
 
-extern "C" const char* abirix_get_error(abirix_context* context) {
+extern "C" const char* ABIRSN_get_error(ABIRSN_context* context) {
     if (!context)
         return "context is null";
     return context->last_error;
 }
 
-extern "C" int abirix_get_bin_size(abirix_context* context) {
+extern "C" int ABIRSN_get_bin_size(ABIRSN_context* context) {
     if (!context)
         return 0;
     return context->result_bin.size();
 }
 
-extern "C" const char* abirix_get_bin_data(abirix_context* context) {
+extern "C" const char* ABIRSN_get_bin_data(ABIRSN_context* context) {
     if (!context)
         return nullptr;
     return context->result_bin.data();
 }
 
-extern "C" const char* abirix_get_bin_hex(abirix_context* context) {
+extern "C" const char* ABIRSN_get_bin_hex(ABIRSN_context* context) {
     return handle_exceptions(context, nullptr, [&] {
         context->result_str.clear();
         hex(context->result_bin.begin(), context->result_bin.end(), std::back_inserter(context->result_str));
@@ -86,19 +86,19 @@ extern "C" const char* abirix_get_bin_hex(abirix_context* context) {
     });
 }
 
-extern "C" uint64_t abirix_string_to_name(abirix_context* context, const char* str) {
+extern "C" uint64_t ABIRSN_string_to_name(ABIRSN_context* context, const char* str) {
     fix_null_str(str);
     return string_to_name(str);
 }
 
-extern "C" const char* abirix_name_to_string(abirix_context* context, uint64_t name) {
+extern "C" const char* ABIRSN_name_to_string(ABIRSN_context* context, uint64_t name) {
     return handle_exceptions(context, nullptr, [&] {
         context->result_str = name_to_string(name);
         return context->result_str.c_str();
     });
 }
 
-extern "C" abirix_bool abirix_set_abi(abirix_context* context, uint64_t contract, const char* abi) {
+extern "C" ABIRSN_bool ABIRSN_set_abi(ABIRSN_context* context, uint64_t contract, const char* abi) {
     fix_null_str(abi);
     return handle_exceptions(context, false, [&]() {
         context->last_error = "abi parse error";
@@ -111,7 +111,7 @@ extern "C" abirix_bool abirix_set_abi(abirix_context* context, uint64_t contract
         }
         if (!check_abi_version(def.version, error))
             return set_error(context, std::move(error));
-        abirix::contract c;
+        ABIRSN::contract c;
         if (!fill_contract(c, error, def)) {
             if (!error.empty())
                 set_error(context, std::move(error));
@@ -122,7 +122,7 @@ extern "C" abirix_bool abirix_set_abi(abirix_context* context, uint64_t contract
     });
 }
 
-extern "C" abirix_bool abirix_set_abi_bin(abirix_context* context, uint64_t contract, const char* data, size_t size) {
+extern "C" ABIRSN_bool ABIRSN_set_abi_bin(ABIRSN_context* context, uint64_t contract, const char* data, size_t size) {
     return handle_exceptions(context, false, [&] {
         context->last_error = "abi parse error";
         if (!data || !size)
@@ -137,7 +137,7 @@ extern "C" abirix_bool abirix_set_abi_bin(abirix_context* context, uint64_t cont
                 set_error(context, std::move(error));
             return false;
         }
-        abirix::contract c;
+        ABIRSN::contract c;
         if (!fill_contract(c, error, def)) {
             if (!error.empty())
                 set_error(context, std::move(error));
@@ -148,9 +148,9 @@ extern "C" abirix_bool abirix_set_abi_bin(abirix_context* context, uint64_t cont
     });
 }
 
-extern "C" abirix_bool abirix_set_abi_hex(abirix_context* context, uint64_t contract, const char* hex) {
+extern "C" ABIRSN_bool ABIRSN_set_abi_hex(ABIRSN_context* context, uint64_t contract, const char* hex) {
     fix_null_str(hex);
-    return handle_exceptions(context, false, [&]() -> abirix_bool {
+    return handle_exceptions(context, false, [&]() -> ABIRSN_bool {
         std::vector<char> data;
         std::string error;
         if (!unhex(error, hex, hex + strlen(hex), std::back_inserter(data))) {
@@ -158,13 +158,13 @@ extern "C" abirix_bool abirix_set_abi_hex(abirix_context* context, uint64_t cont
                 set_error(context, std::move(error));
             return false;
         }
-        return abirix_set_abi_bin(context, contract, data.data(), data.size());
+        return ABIRSN_set_abi_bin(context, contract, data.data(), data.size());
     });
 }
 
-extern "C" const char* abirix_get_type_for_action(abirix_context* context, uint64_t contract, uint64_t action) {
+extern "C" const char* ABIRSN_get_type_for_action(ABIRSN_context* context, uint64_t contract, uint64_t action) {
     return handle_exceptions(context, nullptr, [&] {
-        auto contract_it = context->contracts.find(::abirix::name{contract});
+        auto contract_it = context->contracts.find(::ABIRSN::name{contract});
         if (contract_it == context->contracts.end())
             throw std::runtime_error("contract \"" + name_to_string(contract) + "\" is not loaded");
         auto& c = contract_it->second;
@@ -177,13 +177,13 @@ extern "C" const char* abirix_get_type_for_action(abirix_context* context, uint6
     });
 }
 
-extern "C" abirix_bool abirix_json_to_bin(abirix_context* context, uint64_t contract, const char* type,
+extern "C" ABIRSN_bool ABIRSN_json_to_bin(ABIRSN_context* context, uint64_t contract, const char* type,
                                           const char* json) {
     fix_null_str(type);
     fix_null_str(json);
     return handle_exceptions(context, false, [&] {
         context->last_error = "json parse error";
-        auto contract_it = context->contracts.find(::abirix::name{contract});
+        auto contract_it = context->contracts.find(::ABIRSN::name{contract});
         if (contract_it == context->contracts.end())
             return set_error(context, "contract \"" + name_to_string(contract) + "\" is not loaded");
         abi_type* t;
@@ -200,13 +200,13 @@ extern "C" abirix_bool abirix_json_to_bin(abirix_context* context, uint64_t cont
     });
 }
 
-extern "C" abirix_bool abirix_json_to_bin_reorderable(abirix_context* context, uint64_t contract, const char* type,
+extern "C" ABIRSN_bool ABIRSN_json_to_bin_reorderable(ABIRSN_context* context, uint64_t contract, const char* type,
                                                       const char* json) {
     fix_null_str(type);
     fix_null_str(json);
     return handle_exceptions(context, false, [&] {
         context->last_error = "json parse error";
-        auto contract_it = context->contracts.find(::abirix::name{contract});
+        auto contract_it = context->contracts.find(::ABIRSN::name{contract});
         if (contract_it == context->contracts.end())
             return set_error(context, "contract \"" + name_to_string(contract) + "\" is not loaded");
         abi_type* t;
@@ -214,7 +214,7 @@ extern "C" abirix_bool abirix_json_to_bin_reorderable(abirix_context* context, u
         if (!get_type(t, error, contract_it->second.abi_types, type, 0))
             return set_error(context, error);
         context->result_bin.clear();
-        ::abirix::jvalue value;
+        ::ABIRSN::jvalue value;
         if (!json_to_jvalue(value, error, json)) {
             if (!error.empty())
                 set_error(context, std::move(error));
@@ -229,14 +229,14 @@ extern "C" abirix_bool abirix_json_to_bin_reorderable(abirix_context* context, u
     });
 }
 
-extern "C" const char* abirix_bin_to_json(abirix_context* context, uint64_t contract, const char* type,
+extern "C" const char* ABIRSN_bin_to_json(ABIRSN_context* context, uint64_t contract, const char* type,
                                           const char* data, size_t size) {
     fix_null_str(type);
     return handle_exceptions(context, nullptr, [&]() -> const char* {
         if (!data)
             size = 0;
         context->last_error = "binary decode error";
-        auto contract_it = context->contracts.find(::abirix::name{contract});
+        auto contract_it = context->contracts.find(::ABIRSN::name{contract});
         std::string error;
         if (contract_it == context->contracts.end()) {
             (void)set_error(error, "contract \"" + name_to_string(contract) + "\" is not loaded");
@@ -259,7 +259,7 @@ extern "C" const char* abirix_bin_to_json(abirix_context* context, uint64_t cont
     });
 }
 
-extern "C" const char* abirix_hex_to_json(abirix_context* context, uint64_t contract, const char* type,
+extern "C" const char* ABIRSN_hex_to_json(ABIRSN_context* context, uint64_t contract, const char* type,
                                           const char* hex) {
     fix_null_str(hex);
     return handle_exceptions(context, nullptr, [&]() -> const char* {
@@ -270,6 +270,6 @@ extern "C" const char* abirix_hex_to_json(abirix_context* context, uint64_t cont
                 set_error(context, std::move(error));
             return nullptr;
         }
-        return abirix_bin_to_json(context, contract, type, data.data(), data.size());
+        return ABIRSN_bin_to_json(context, contract, type, data.data(), data.size());
     });
 }

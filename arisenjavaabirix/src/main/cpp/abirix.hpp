@@ -1,4 +1,4 @@
-// copyright defined in abirix/LICENSE.txt
+// copyright defined in ABIRSN/LICENSE.txt
 
 #pragma once
 
@@ -9,13 +9,13 @@
 #include <variant>
 #include <vector>
 
-#include "abirix_numeric.hpp"
+#include "ABIRSN_numeric.hpp"
 
 #include "rapidjson/reader.h"
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
 
-namespace abirix {
+namespace ABIRSN {
 
 inline constexpr bool trace_json_to_jvalue_event = false;
 inline constexpr bool trace_json_to_jvalue = false;
@@ -109,7 +109,7 @@ void hex(SrcIt begin, SrcIt end, DestIt dest) {
 }
 
 template <typename SrcIt, typename DestIt>
-ABIRIX_NODISCARD bool unhex(std::string& error, SrcIt begin, SrcIt end, DestIt dest) {
+ABIRSN_NODISCARD bool unhex(std::string& error, SrcIt begin, SrcIt end, DestIt dest) {
     auto get_digit = [&](uint8_t& nibble) {
         if (*begin >= '0' && *begin <= '9')
             nibble = *begin++ - '0';
@@ -141,7 +141,7 @@ struct input_buffer {
     const char* end = nullptr;
 };
 
-ABIRIX_NODISCARD inline bool read_raw(input_buffer& bin, std::string& error, void* dest, ptrdiff_t size) {
+ABIRSN_NODISCARD inline bool read_raw(input_buffer& bin, std::string& error, void* dest, ptrdiff_t size) {
     if (bin.end - bin.pos < size)
         return set_error(error, "read past end");
     if (size)
@@ -151,12 +151,12 @@ ABIRIX_NODISCARD inline bool read_raw(input_buffer& bin, std::string& error, voi
 }
 
 template <typename T>
-ABIRIX_NODISCARD bool read_raw(input_buffer& bin, std::string& error, T& dest) {
+ABIRSN_NODISCARD bool read_raw(input_buffer& bin, std::string& error, T& dest) {
     static_assert(std::is_trivially_copyable_v<T>);
     return read_raw(bin, error, &dest, sizeof(dest));
 }
 
-ABIRIX_NODISCARD inline bool read_raw(input_buffer& bin, std::string& error, bool& dest) {
+ABIRSN_NODISCARD inline bool read_raw(input_buffer& bin, std::string& error, bool& dest) {
     char tmp;
     if (!read_raw(bin, error, &tmp, sizeof(tmp)))
         return false;
@@ -164,9 +164,9 @@ ABIRIX_NODISCARD inline bool read_raw(input_buffer& bin, std::string& error, boo
     return true;
 }
 
-ABIRIX_NODISCARD bool read_varuint32(input_buffer& bin, std::string& error, uint32_t& dest);
+ABIRSN_NODISCARD bool read_varuint32(input_buffer& bin, std::string& error, uint32_t& dest);
 
-ABIRIX_NODISCARD inline bool read_string(input_buffer& bin, std::string& error, std::string& dest) {
+ABIRSN_NODISCARD inline bool read_string(input_buffer& bin, std::string& error, std::string& dest) {
     uint32_t size;
     if (!read_varuint32(bin, error, size))
         return false;
@@ -197,8 +197,8 @@ struct event_data {
     std::string key{};
 };
 
-ABIRIX_NODISCARD bool receive_event(struct json_to_native_state&, event_type, bool start);
-ABIRIX_NODISCARD bool receive_event(struct json_to_bin_state&, event_type, bool start);
+ABIRSN_NODISCARD bool receive_event(struct json_to_native_state&, event_type, bool start);
+ABIRSN_NODISCARD bool receive_event(struct json_to_bin_state&, event_type, bool start);
 
 template <typename Derived>
 struct json_reader_handler : public rapidjson::BaseReaderHandler<rapidjson::UTF8<>, Derived> {
@@ -362,13 +362,13 @@ struct bin_to_json_state : json_reader_handler<bin_to_json_state> {
 };
 
 struct native_serializer {
-    ABIRIX_NODISCARD virtual bool bin_to_native(void*, bin_to_native_state&, bool) const = 0;
-    ABIRIX_NODISCARD virtual bool json_to_native(void*, json_to_native_state&, event_type, bool) const = 0;
+    ABIRSN_NODISCARD virtual bool bin_to_native(void*, bin_to_native_state&, bool) const = 0;
+    ABIRSN_NODISCARD virtual bool json_to_native(void*, json_to_native_state&, event_type, bool) const = 0;
 };
 
 struct native_field_serializer_methods {
-    ABIRIX_NODISCARD virtual bool bin_to_native(void*, bin_to_native_state&, bool) const = 0;
-    ABIRIX_NODISCARD virtual bool json_to_native(void*, json_to_native_state&, event_type, bool) const = 0;
+    ABIRSN_NODISCARD virtual bool bin_to_native(void*, bin_to_native_state&, bool) const = 0;
+    ABIRSN_NODISCARD virtual bool json_to_native(void*, json_to_native_state&, event_type, bool) const = 0;
 };
 
 struct native_field_serializer {
@@ -377,11 +377,11 @@ struct native_field_serializer {
 };
 
 struct abi_serializer {
-    ABIRIX_NODISCARD virtual bool json_to_bin(jvalue_to_bin_state& state, bool allow_extensions, const abi_type* type,
+    ABIRSN_NODISCARD virtual bool json_to_bin(jvalue_to_bin_state& state, bool allow_extensions, const abi_type* type,
                                               event_type event, bool start) const = 0;
-    ABIRIX_NODISCARD virtual bool json_to_bin(json_to_bin_state& state, bool allow_extensions, const abi_type* type,
+    ABIRSN_NODISCARD virtual bool json_to_bin(json_to_bin_state& state, bool allow_extensions, const abi_type* type,
                                               event_type event, bool start) const = 0;
-    ABIRIX_NODISCARD virtual bool bin_to_json(bin_to_json_state& state, bool allow_extensions, const abi_type* type,
+    ABIRSN_NODISCARD virtual bool bin_to_json(bin_to_json_state& state, bool allow_extensions, const abi_type* type,
                                               bool start) const = 0;
 };
 
@@ -390,22 +390,22 @@ struct abi_serializer {
 ///////////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-ABIRIX_NODISCARD auto bin_to_native(T& obj, bin_to_native_state& state, bool start)
+ABIRSN_NODISCARD auto bin_to_native(T& obj, bin_to_native_state& state, bool start)
     -> std::enable_if_t<std::is_arithmetic_v<T>, bool>;
 template <typename T>
-ABIRIX_NODISCARD auto bin_to_native(T& obj, bin_to_native_state& state, bool start)
+ABIRSN_NODISCARD auto bin_to_native(T& obj, bin_to_native_state& state, bool start)
     -> std::enable_if_t<std::is_class_v<T>, bool>;
 template <typename T>
-ABIRIX_NODISCARD bool bin_to_native(std::vector<T>& v, bin_to_native_state& state, bool start);
+ABIRSN_NODISCARD bool bin_to_native(std::vector<T>& v, bin_to_native_state& state, bool start);
 template <typename First, typename Second>
-ABIRIX_NODISCARD bool bin_to_native(std::pair<First, Second>& obj, bin_to_native_state& state, bool start);
-ABIRIX_NODISCARD bool bin_to_native(std::string& obj, bin_to_native_state& state, bool);
+ABIRSN_NODISCARD bool bin_to_native(std::pair<First, Second>& obj, bin_to_native_state& state, bool start);
+ABIRSN_NODISCARD bool bin_to_native(std::string& obj, bin_to_native_state& state, bool);
 template <typename T>
-ABIRIX_NODISCARD bool bin_to_native(std::optional<T>& v, bin_to_native_state& state, bool start);
+ABIRSN_NODISCARD bool bin_to_native(std::optional<T>& v, bin_to_native_state& state, bool start);
 template <typename... Ts>
-ABIRIX_NODISCARD bool bin_to_native(std::variant<Ts...>& v, bin_to_native_state& state, bool start);
+ABIRSN_NODISCARD bool bin_to_native(std::variant<Ts...>& v, bin_to_native_state& state, bool start);
 template <typename T>
-ABIRIX_NODISCARD bool bin_to_native(might_not_exist<T>& obj, bin_to_native_state& state, bool);
+ABIRSN_NODISCARD bool bin_to_native(might_not_exist<T>& obj, bin_to_native_state& state, bool);
 
 template <typename T>
 void native_to_bin(std::vector<char>& bin, const T& obj);
@@ -414,72 +414,72 @@ template <typename T>
 void native_to_bin(std::vector<char>& bin, const std::vector<T>& obj);
 
 template <typename T>
-ABIRIX_NODISCARD auto json_to_native(T& obj, json_to_native_state& state, event_type event, bool start)
+ABIRSN_NODISCARD auto json_to_native(T& obj, json_to_native_state& state, event_type event, bool start)
     -> std::enable_if_t<std::is_arithmetic_v<T>, bool>;
 template <typename T>
-ABIRIX_NODISCARD auto json_to_native(T& obj, json_to_native_state& state, event_type event, bool start)
+ABIRSN_NODISCARD auto json_to_native(T& obj, json_to_native_state& state, event_type event, bool start)
     -> std::enable_if_t<std::is_class_v<T>, bool>;
 template <typename T>
-ABIRIX_NODISCARD bool json_to_native(std::vector<T>& obj, json_to_native_state& state, event_type event, bool start);
+ABIRSN_NODISCARD bool json_to_native(std::vector<T>& obj, json_to_native_state& state, event_type event, bool start);
 template <typename First, typename Second>
-ABIRIX_NODISCARD bool json_to_native(std::pair<First, Second>& obj, json_to_native_state& state, event_type event,
+ABIRSN_NODISCARD bool json_to_native(std::pair<First, Second>& obj, json_to_native_state& state, event_type event,
                                      bool start);
-ABIRIX_NODISCARD bool json_to_native(std::string& obj, json_to_native_state& state, event_type event, bool start);
+ABIRSN_NODISCARD bool json_to_native(std::string& obj, json_to_native_state& state, event_type event, bool start);
 template <typename T>
-ABIRIX_NODISCARD bool json_to_native(std::optional<T>& obj, json_to_native_state& state, event_type event, bool start);
+ABIRSN_NODISCARD bool json_to_native(std::optional<T>& obj, json_to_native_state& state, event_type event, bool start);
 template <typename... Ts>
-ABIRIX_NODISCARD bool json_to_native(std::variant<Ts...>& obj, json_to_native_state& state, event_type event,
+ABIRSN_NODISCARD bool json_to_native(std::variant<Ts...>& obj, json_to_native_state& state, event_type event,
                                      bool start);
 template <typename T>
-ABIRIX_NODISCARD bool json_to_native(might_not_exist<T>& obj, json_to_native_state& state, event_type event,
+ABIRSN_NODISCARD bool json_to_native(might_not_exist<T>& obj, json_to_native_state& state, event_type event,
                                      bool start);
 
-ABIRIX_NODISCARD bool json_to_bin(pseudo_optional*, jvalue_to_bin_state& state, bool allow_extensions,
+ABIRSN_NODISCARD bool json_to_bin(pseudo_optional*, jvalue_to_bin_state& state, bool allow_extensions,
                                   const abi_type* type, event_type event, bool);
-ABIRIX_NODISCARD bool json_to_bin(pseudo_extension*, jvalue_to_bin_state& state, bool allow_extensions,
+ABIRSN_NODISCARD bool json_to_bin(pseudo_extension*, jvalue_to_bin_state& state, bool allow_extensions,
                                   const abi_type* type, event_type event, bool);
-ABIRIX_NODISCARD bool json_to_bin(pseudo_object*, jvalue_to_bin_state& state, bool allow_extensions,
+ABIRSN_NODISCARD bool json_to_bin(pseudo_object*, jvalue_to_bin_state& state, bool allow_extensions,
                                   const abi_type* type, event_type event, bool start);
-ABIRIX_NODISCARD bool json_to_bin(pseudo_array*, jvalue_to_bin_state& state, bool allow_extensions,
+ABIRSN_NODISCARD bool json_to_bin(pseudo_array*, jvalue_to_bin_state& state, bool allow_extensions,
                                   const abi_type* type, event_type event, bool start);
-ABIRIX_NODISCARD bool json_to_bin(pseudo_variant*, jvalue_to_bin_state& state, bool allow_extensions,
+ABIRSN_NODISCARD bool json_to_bin(pseudo_variant*, jvalue_to_bin_state& state, bool allow_extensions,
                                   const abi_type* type, event_type event, bool start);
 template <typename T>
-ABIRIX_NODISCARD auto json_to_bin(T*, jvalue_to_bin_state& state, bool allow_extensions, const abi_type*,
+ABIRSN_NODISCARD auto json_to_bin(T*, jvalue_to_bin_state& state, bool allow_extensions, const abi_type*,
                                   event_type event, bool start) -> std::enable_if_t<std::is_arithmetic_v<T>, bool>;
-ABIRIX_NODISCARD bool json_to_bin(std::string*, jvalue_to_bin_state& state, bool allow_extensions, const abi_type*,
+ABIRSN_NODISCARD bool json_to_bin(std::string*, jvalue_to_bin_state& state, bool allow_extensions, const abi_type*,
                                   event_type event, bool start);
 
 template <typename T>
-ABIRIX_NODISCARD auto json_to_bin(T*, json_to_bin_state& state, bool allow_extensions, const abi_type*,
+ABIRSN_NODISCARD auto json_to_bin(T*, json_to_bin_state& state, bool allow_extensions, const abi_type*,
                                   event_type event, bool start) -> std::enable_if_t<std::is_arithmetic_v<T>, bool>;
-ABIRIX_NODISCARD bool json_to_bin(std::string*, json_to_bin_state& state, bool allow_extensions, const abi_type*,
+ABIRSN_NODISCARD bool json_to_bin(std::string*, json_to_bin_state& state, bool allow_extensions, const abi_type*,
                                   event_type event, bool start);
-ABIRIX_NODISCARD bool json_to_bin(pseudo_optional*, json_to_bin_state& state, bool allow_extensions,
+ABIRSN_NODISCARD bool json_to_bin(pseudo_optional*, json_to_bin_state& state, bool allow_extensions,
                                   const abi_type* type, event_type event, bool start);
-ABIRIX_NODISCARD bool json_to_bin(pseudo_extension*, json_to_bin_state& state, bool allow_extensions,
+ABIRSN_NODISCARD bool json_to_bin(pseudo_extension*, json_to_bin_state& state, bool allow_extensions,
                                   const abi_type* type, event_type event, bool start);
-ABIRIX_NODISCARD bool json_to_bin(pseudo_object*, json_to_bin_state& state, bool allow_extensions, const abi_type* type,
+ABIRSN_NODISCARD bool json_to_bin(pseudo_object*, json_to_bin_state& state, bool allow_extensions, const abi_type* type,
                                   event_type event, bool start);
-ABIRIX_NODISCARD bool json_to_bin(pseudo_array*, json_to_bin_state& state, bool allow_extensions, const abi_type* type,
+ABIRSN_NODISCARD bool json_to_bin(pseudo_array*, json_to_bin_state& state, bool allow_extensions, const abi_type* type,
                                   event_type event, bool start);
-ABIRIX_NODISCARD bool json_to_bin(pseudo_variant*, json_to_bin_state& state, bool allow_extensions,
+ABIRSN_NODISCARD bool json_to_bin(pseudo_variant*, json_to_bin_state& state, bool allow_extensions,
                                   const abi_type* type, event_type event, bool start);
 
 template <typename T>
-ABIRIX_NODISCARD auto bin_to_json(T*, bin_to_json_state& state, bool allow_extensions, const abi_type*, bool start)
+ABIRSN_NODISCARD auto bin_to_json(T*, bin_to_json_state& state, bool allow_extensions, const abi_type*, bool start)
     -> std::enable_if_t<std::is_arithmetic_v<T>, bool>;
-ABIRIX_NODISCARD bool bin_to_json(std::string*, bin_to_json_state& state, bool allow_extensions, const abi_type*,
+ABIRSN_NODISCARD bool bin_to_json(std::string*, bin_to_json_state& state, bool allow_extensions, const abi_type*,
                                   bool start);
-ABIRIX_NODISCARD bool bin_to_json(pseudo_optional*, bin_to_json_state& state, bool allow_extensions,
+ABIRSN_NODISCARD bool bin_to_json(pseudo_optional*, bin_to_json_state& state, bool allow_extensions,
                                   const abi_type* type, bool start);
-ABIRIX_NODISCARD bool bin_to_json(pseudo_extension*, bin_to_json_state& state, bool allow_extensions,
+ABIRSN_NODISCARD bool bin_to_json(pseudo_extension*, bin_to_json_state& state, bool allow_extensions,
                                   const abi_type* type, bool start);
-ABIRIX_NODISCARD bool bin_to_json(pseudo_object*, bin_to_json_state& state, bool allow_extensions, const abi_type* type,
+ABIRSN_NODISCARD bool bin_to_json(pseudo_object*, bin_to_json_state& state, bool allow_extensions, const abi_type* type,
                                   bool start);
-ABIRIX_NODISCARD bool bin_to_json(pseudo_array*, bin_to_json_state& state, bool allow_extensions, const abi_type* type,
+ABIRSN_NODISCARD bool bin_to_json(pseudo_array*, bin_to_json_state& state, bool allow_extensions, const abi_type* type,
                                   bool start);
-ABIRIX_NODISCARD bool bin_to_json(pseudo_variant*, bin_to_json_state& state, bool allow_extensions,
+ABIRSN_NODISCARD bool bin_to_json(pseudo_variant*, bin_to_json_state& state, bool allow_extensions,
                                   const abi_type* type, bool start);
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -487,7 +487,7 @@ ABIRIX_NODISCARD bool bin_to_json(pseudo_variant*, bin_to_json_state& state, boo
 ///////////////////////////////////////////////////////////////////////////////
 
 template <typename T, typename State>
-ABIRIX_NODISCARD bool json_to_number(T& dest, State& state, event_type event) {
+ABIRSN_NODISCARD bool json_to_number(T& dest, State& state, event_type event) {
     if (event == event_type::received_bool) {
         dest = state.get_bool();
         return true;
@@ -513,7 +513,7 @@ ABIRIX_NODISCARD bool json_to_number(T& dest, State& state, event_type event) {
         }
     }
     return set_error(state.error, "expected number or boolean");
-} // namespace abirix
+} // namespace ABIRSN
 
 struct bytes {
     std::vector<char> data;
@@ -521,7 +521,7 @@ struct bytes {
 
 void push_varuint32(std::vector<char>& bin, uint32_t v);
 
-ABIRIX_NODISCARD inline bool bin_to_native(bytes& obj, bin_to_native_state& state, bool) {
+ABIRSN_NODISCARD inline bool bin_to_native(bytes& obj, bin_to_native_state& state, bool) {
     uint32_t size;
     if (!read_varuint32(state.bin, state.error, size))
         return false;
@@ -531,7 +531,7 @@ ABIRIX_NODISCARD inline bool bin_to_native(bytes& obj, bin_to_native_state& stat
     return read_raw(state.bin, state.error, obj.data.data(), size);
 }
 
-ABIRIX_NODISCARD inline bool bin_to_native(input_buffer& obj, bin_to_native_state& state, bool) {
+ABIRSN_NODISCARD inline bool bin_to_native(input_buffer& obj, bin_to_native_state& state, bool) {
     uint32_t size;
     if (!read_varuint32(state.bin, state.error, size))
         return false;
@@ -547,7 +547,7 @@ inline void native_to_bin(std::vector<char>& bin, const bytes& obj) {
     bin.insert(bin.end(), obj.data.begin(), obj.data.end());
 }
 
-ABIRIX_NODISCARD inline bool json_to_native(bytes& obj, json_to_native_state& state, event_type event, bool start) {
+ABIRSN_NODISCARD inline bool json_to_native(bytes& obj, json_to_native_state& state, event_type event, bool start) {
     if (event == event_type::received_string) {
         auto& s = state.get_string();
         if (trace_json_to_native)
@@ -560,13 +560,13 @@ ABIRIX_NODISCARD inline bool json_to_native(bytes& obj, json_to_native_state& st
         return set_error(state, "expected string containing hex digits");
 }
 
-ABIRIX_NODISCARD inline bool json_to_native(input_buffer& obj, json_to_native_state& state, event_type event,
+ABIRSN_NODISCARD inline bool json_to_native(input_buffer& obj, json_to_native_state& state, event_type event,
                                             bool start) {
     return set_error(state, "can not convert json to input_buffer");
 }
 
 template <typename State>
-ABIRIX_NODISCARD bool json_to_bin(bytes*, State& state, bool, const abi_type*, event_type event, bool start) {
+ABIRSN_NODISCARD bool json_to_bin(bytes*, State& state, bool, const abi_type*, event_type event, bool start) {
     if (event == event_type::received_string) {
         auto& s = state.get_string();
         if (trace_json_to_bin)
@@ -579,7 +579,7 @@ ABIRIX_NODISCARD bool json_to_bin(bytes*, State& state, bool, const abi_type*, e
         return set_error(state, "expected string containing hex digits");
 }
 
-ABIRIX_NODISCARD inline bool bin_to_json(bytes*, bin_to_json_state& state, bool, const abi_type*, bool start) {
+ABIRSN_NODISCARD inline bool bin_to_json(bytes*, bin_to_json_state& state, bool, const abi_type*, bool start) {
     uint32_t size;
     if (!read_varuint32(state.bin, state.error, size))
         return false;
@@ -620,7 +620,7 @@ using checksum256 = fixed_binary<32>;
 using checksum512 = fixed_binary<64>;
 
 template <unsigned size>
-ABIRIX_NODISCARD bool bin_to_native(fixed_binary<size>& obj, bin_to_native_state& state, bool start) {
+ABIRSN_NODISCARD bool bin_to_native(fixed_binary<size>& obj, bin_to_native_state& state, bool start) {
     return read_raw(state.bin, state.error, obj);
 }
 
@@ -630,7 +630,7 @@ inline void native_to_bin(std::vector<char>& bin, const fixed_binary<size>& obj)
 }
 
 template <unsigned size>
-ABIRIX_NODISCARD bool json_to_native(fixed_binary<size>& obj, json_to_native_state& state, event_type event,
+ABIRSN_NODISCARD bool json_to_native(fixed_binary<size>& obj, json_to_native_state& state, event_type event,
                                      bool start) {
     if (event == event_type::received_string) {
         auto& s = state.get_string();
@@ -648,7 +648,7 @@ ABIRIX_NODISCARD bool json_to_native(fixed_binary<size>& obj, json_to_native_sta
 }
 
 template <typename State, unsigned size>
-ABIRIX_NODISCARD bool json_to_bin(fixed_binary<size>*, State& state, bool, const abi_type*, event_type event,
+ABIRSN_NODISCARD bool json_to_bin(fixed_binary<size>*, State& state, bool, const abi_type*, event_type event,
                                   bool start) {
     if (event == event_type::received_string) {
         auto& s = state.get_string();
@@ -666,7 +666,7 @@ ABIRIX_NODISCARD bool json_to_bin(fixed_binary<size>*, State& state, bool, const
 }
 
 template <unsigned size>
-ABIRIX_NODISCARD inline bool bin_to_json(fixed_binary<size>*, bin_to_json_state& state, bool, const abi_type*,
+ABIRSN_NODISCARD inline bool bin_to_json(fixed_binary<size>*, bin_to_json_state& state, bool, const abi_type*,
                                          bool start) {
     fixed_binary<size> v;
     if (!read_raw(state.bin, state.error, v))
@@ -683,7 +683,7 @@ struct uint128 {
 };
 
 template <typename State>
-ABIRIX_NODISCARD bool json_to_bin(uint128*, State& state, bool, const abi_type*, event_type event, bool start) {
+ABIRSN_NODISCARD bool json_to_bin(uint128*, State& state, bool, const abi_type*, event_type event, bool start) {
     if (event == event_type::received_string) {
         auto& s = state.get_string();
         if (trace_json_to_bin)
@@ -697,7 +697,7 @@ ABIRIX_NODISCARD bool json_to_bin(uint128*, State& state, bool, const abi_type*,
         return set_error(state, "expected string containing uint128");
 }
 
-ABIRIX_NODISCARD inline bool bin_to_json(uint128*, bin_to_json_state& state, bool, const abi_type*, bool start) {
+ABIRSN_NODISCARD inline bool bin_to_json(uint128*, bin_to_json_state& state, bool, const abi_type*, bool start) {
     uint128 v;
     if (!read_raw(state.bin, state.error, v))
         return false;
@@ -721,7 +721,7 @@ struct int128 {
 };
 
 template <typename State>
-ABIRIX_NODISCARD bool json_to_bin(int128*, State& state, bool, const abi_type*, event_type event, bool start) {
+ABIRSN_NODISCARD bool json_to_bin(int128*, State& state, bool, const abi_type*, event_type event, bool start) {
     if (event == event_type::received_string) {
         std::string_view s = state.get_string();
         if (trace_json_to_bin)
@@ -744,7 +744,7 @@ ABIRIX_NODISCARD bool json_to_bin(int128*, State& state, bool, const abi_type*, 
         return set_error(state, "expected string containing int128");
 }
 
-ABIRIX_NODISCARD inline bool bin_to_json(int128*, bin_to_json_state& state, bool, const abi_type*, bool start) {
+ABIRSN_NODISCARD inline bool bin_to_json(int128*, bin_to_json_state& state, bool, const abi_type*, bool start) {
     uint128 v;
     if (!read_raw(state.bin, state.error, v))
         return false;
@@ -757,19 +757,19 @@ ABIRIX_NODISCARD inline bool bin_to_json(int128*, bin_to_json_state& state, bool
     return state.writer.String(result.c_str(), result.size());
 }
 
-ABIRIX_NODISCARD inline bool bin_to_native(public_key& obj, bin_to_native_state& state, bool) {
+ABIRSN_NODISCARD inline bool bin_to_native(public_key& obj, bin_to_native_state& state, bool) {
     return read_raw(state.bin, state.error, obj);
 }
 
 inline void native_to_bin(std::vector<char>& bin, const public_key& obj) { return push_raw(bin, obj); }
 
-ABIRIX_NODISCARD inline bool json_to_native(public_key& obj, json_to_native_state& state, event_type event,
+ABIRSN_NODISCARD inline bool json_to_native(public_key& obj, json_to_native_state& state, event_type event,
                                             bool start) {
     return set_error(state, "can't convert public_key");
 }
 
 template <typename State>
-ABIRIX_NODISCARD bool json_to_bin(public_key*, State& state, bool, const abi_type*, event_type event, bool start) {
+ABIRSN_NODISCARD bool json_to_bin(public_key*, State& state, bool, const abi_type*, event_type event, bool start) {
     if (event == event_type::received_string) {
         auto& s = state.get_string();
         if (trace_json_to_bin)
@@ -783,7 +783,7 @@ ABIRIX_NODISCARD bool json_to_bin(public_key*, State& state, bool, const abi_typ
         return set_error(state, "expected string containing public_key");
 }
 
-ABIRIX_NODISCARD inline bool bin_to_json(public_key*, bin_to_json_state& state, bool, const abi_type*, bool start) {
+ABIRSN_NODISCARD inline bool bin_to_json(public_key*, bin_to_json_state& state, bool, const abi_type*, bool start) {
     public_key v;
     if (!read_raw(state.bin, state.error, v))
         return false;
@@ -794,7 +794,7 @@ ABIRIX_NODISCARD inline bool bin_to_json(public_key*, bin_to_json_state& state, 
 }
 
 template <typename State>
-ABIRIX_NODISCARD bool json_to_bin(private_key*, State& state, bool, const abi_type*, event_type event, bool start) {
+ABIRSN_NODISCARD bool json_to_bin(private_key*, State& state, bool, const abi_type*, event_type event, bool start) {
     if (event == event_type::received_string) {
         auto& s = state.get_string();
         if (trace_json_to_bin)
@@ -808,7 +808,7 @@ ABIRIX_NODISCARD bool json_to_bin(private_key*, State& state, bool, const abi_ty
         return set_error(state, "expected string containing private_key");
 }
 
-ABIRIX_NODISCARD inline bool bin_to_json(private_key*, bin_to_json_state& state, bool, const abi_type*, bool start) {
+ABIRSN_NODISCARD inline bool bin_to_json(private_key*, bin_to_json_state& state, bool, const abi_type*, bool start) {
     private_key v;
     if (!read_raw(state.bin, state.error, v))
         return false;
@@ -818,11 +818,11 @@ ABIRIX_NODISCARD inline bool bin_to_json(private_key*, bin_to_json_state& state,
     return state.writer.String(result.c_str(), result.size());
 }
 
-ABIRIX_NODISCARD inline bool bin_to_native(signature& obj, bin_to_native_state& state, bool) {
+ABIRSN_NODISCARD inline bool bin_to_native(signature& obj, bin_to_native_state& state, bool) {
     return read_raw(state.bin, state.error, obj);
 }
 
-ABIRIX_NODISCARD inline bool json_to_native(signature& obj, json_to_native_state& state, event_type event, bool start) {
+ABIRSN_NODISCARD inline bool json_to_native(signature& obj, json_to_native_state& state, event_type event, bool start) {
     if (event == event_type::received_string)
         return string_to_signature(obj, state.error, state.get_string());
     else
@@ -830,7 +830,7 @@ ABIRIX_NODISCARD inline bool json_to_native(signature& obj, json_to_native_state
 }
 
 template <typename State>
-ABIRIX_NODISCARD bool json_to_bin(signature*, State& state, bool, const abi_type*, event_type event, bool start) {
+ABIRSN_NODISCARD bool json_to_bin(signature*, State& state, bool, const abi_type*, event_type event, bool start) {
     if (event == event_type::received_string) {
         auto& s = state.get_string();
         if (trace_json_to_bin)
@@ -844,7 +844,7 @@ ABIRIX_NODISCARD bool json_to_bin(signature*, State& state, bool, const abi_type
         return set_error(state, "expected string containing signature");
 }
 
-ABIRIX_NODISCARD inline bool bin_to_json(signature*, bin_to_json_state& state, bool, const abi_type*, bool start) {
+ABIRSN_NODISCARD inline bool bin_to_json(signature*, bin_to_json_state& state, bool, const abi_type*, bool start) {
     signature v;
     if (!read_raw(state.bin, state.error, v))
         return false;
@@ -935,17 +935,17 @@ struct name {
     explicit operator std::string() const { return name_to_string(value); }
 };
 
-ABIRIX_NODISCARD inline bool operator==(name a, name b) { return a.value == b.value; }
-ABIRIX_NODISCARD inline bool operator!=(name a, name b) { return a.value != b.value; }
-ABIRIX_NODISCARD inline bool operator<(name a, name b) { return a.value < b.value; }
+ABIRSN_NODISCARD inline bool operator==(name a, name b) { return a.value == b.value; }
+ABIRSN_NODISCARD inline bool operator!=(name a, name b) { return a.value != b.value; }
+ABIRSN_NODISCARD inline bool operator<(name a, name b) { return a.value < b.value; }
 
-ABIRIX_NODISCARD inline bool bin_to_native(name& obj, bin_to_native_state& state, bool start) {
+ABIRSN_NODISCARD inline bool bin_to_native(name& obj, bin_to_native_state& state, bool start) {
     return bin_to_native(obj.value, state, start);
 }
 
 inline void native_to_bin(std::vector<char>& bin, const name& obj) { native_to_bin(bin, obj.value); }
 
-ABIRIX_NODISCARD inline bool json_to_native(name& obj, json_to_native_state& state, event_type event, bool start) {
+ABIRSN_NODISCARD inline bool json_to_native(name& obj, json_to_native_state& state, event_type event, bool start) {
     if (event == event_type::received_string) {
         obj.value = string_to_name(state.get_string().c_str());
         if (trace_json_to_native)
@@ -957,7 +957,7 @@ ABIRIX_NODISCARD inline bool json_to_native(name& obj, json_to_native_state& sta
 }
 
 template <typename State>
-ABIRIX_NODISCARD bool json_to_bin(name*, State& state, bool, const abi_type*, event_type event, bool start) {
+ABIRSN_NODISCARD bool json_to_bin(name*, State& state, bool, const abi_type*, event_type event, bool start) {
     if (event == event_type::received_string) {
         name obj{string_to_name(state.get_string().c_str())};
         if (trace_json_to_bin)
@@ -969,7 +969,7 @@ ABIRIX_NODISCARD bool json_to_bin(name*, State& state, bool, const abi_type*, ev
         return set_error(state, "expected string containing name");
 }
 
-ABIRIX_NODISCARD inline bool bin_to_json(name*, bin_to_json_state& state, bool, const abi_type*, bool start) {
+ABIRSN_NODISCARD inline bool bin_to_json(name*, bin_to_json_state& state, bool, const abi_type*, bool start) {
     name v;
     if (!read_raw(state.bin, state.error, v))
         return false;
@@ -993,7 +993,7 @@ inline void push_varuint32(std::vector<char>& bin, uint32_t v) {
     } while (val);
 }
 
-ABIRIX_NODISCARD inline bool read_varuint32(input_buffer& bin, std::string& error, uint32_t& dest) {
+ABIRSN_NODISCARD inline bool read_varuint32(input_buffer& bin, std::string& error, uint32_t& dest) {
     dest = 0;
     int shift = 0;
     uint8_t b = 0;
@@ -1008,13 +1008,13 @@ ABIRIX_NODISCARD inline bool read_varuint32(input_buffer& bin, std::string& erro
     return true;
 }
 
-ABIRIX_NODISCARD inline bool bin_to_native(varuint32& obj, bin_to_native_state& state, bool) {
+ABIRSN_NODISCARD inline bool bin_to_native(varuint32& obj, bin_to_native_state& state, bool) {
     return read_varuint32(state.bin, state.error, obj.value);
 }
 
 inline void native_to_bin(std::vector<char>& bin, const varuint32& obj) { push_varuint32(bin, obj.value); }
 
-ABIRIX_NODISCARD inline bool json_to_native(varuint32& obj, json_to_native_state& state, event_type event, bool) {
+ABIRSN_NODISCARD inline bool json_to_native(varuint32& obj, json_to_native_state& state, event_type event, bool) {
     uint32_t x;
     if (!json_to_number(x, state, event))
         return false;
@@ -1023,7 +1023,7 @@ ABIRIX_NODISCARD inline bool json_to_native(varuint32& obj, json_to_native_state
 }
 
 template <typename State>
-ABIRIX_NODISCARD bool json_to_bin(varuint32*, State& state, bool, const abi_type*, event_type event, bool start) {
+ABIRSN_NODISCARD bool json_to_bin(varuint32*, State& state, bool, const abi_type*, event_type event, bool start) {
     uint32_t x;
     if (!json_to_number(x, state, event))
         return false;
@@ -1031,7 +1031,7 @@ ABIRIX_NODISCARD bool json_to_bin(varuint32*, State& state, bool, const abi_type
     return true;
 }
 
-ABIRIX_NODISCARD inline bool bin_to_json(varuint32*, bin_to_json_state& state, bool, const abi_type*, bool start) {
+ABIRSN_NODISCARD inline bool bin_to_json(varuint32*, bin_to_json_state& state, bool, const abi_type*, bool start) {
     uint32_t v;
     if (!read_varuint32(state.bin, state.error, v))
         return false;
@@ -1048,7 +1048,7 @@ inline void push_varint32(std::vector<char>& bin, int32_t v) {
     push_varuint32(bin, (uint32_t(v) << 1) ^ uint32_t(v >> 31));
 }
 
-ABIRIX_NODISCARD inline bool read_varint32(input_buffer& bin, std::string& error, int32_t& result) {
+ABIRSN_NODISCARD inline bool read_varint32(input_buffer& bin, std::string& error, int32_t& result) {
     uint32_t v;
     if (!read_varuint32(bin, error, v))
         return false;
@@ -1060,7 +1060,7 @@ ABIRIX_NODISCARD inline bool read_varint32(input_buffer& bin, std::string& error
 }
 
 template <typename State>
-ABIRIX_NODISCARD bool json_to_bin(varint32*, State& state, bool, const abi_type*, event_type event, bool start) {
+ABIRSN_NODISCARD bool json_to_bin(varint32*, State& state, bool, const abi_type*, event_type event, bool start) {
     int32_t x;
     if (!json_to_number(x, state, event))
         return false;
@@ -1068,7 +1068,7 @@ ABIRIX_NODISCARD bool json_to_bin(varint32*, State& state, bool, const abi_type*
     return true;
 }
 
-ABIRIX_NODISCARD inline bool bin_to_json(varint32*, bin_to_json_state& state, bool, const abi_type*, bool start) {
+ABIRSN_NODISCARD inline bool bin_to_json(varint32*, bin_to_json_state& state, bool, const abi_type*, bool start) {
     int32_t v;
     if (!read_varint32(state.bin, state.error, v))
         return false;
@@ -1116,7 +1116,7 @@ struct time_point_sec {
     explicit operator std::string() { return microseconds_to_str(uint64_t(utc_seconds) * 1'000'000); }
 };
 
-ABIRIX_NODISCARD inline bool string_to_time_point_sec(time_point_sec& result, std::string& error, const char* s) {
+ABIRSN_NODISCARD inline bool string_to_time_point_sec(time_point_sec& result, std::string& error, const char* s) {
     auto parse_uint = [&](uint32_t& result, int digits) {
         result = 0;
         while (digits--) {
@@ -1155,19 +1155,19 @@ ABIRIX_NODISCARD inline bool string_to_time_point_sec(time_point_sec& result, st
     return true;
 }
 
-ABIRIX_NODISCARD inline bool bin_to_native(time_point_sec& obj, bin_to_native_state& state, bool) {
+ABIRSN_NODISCARD inline bool bin_to_native(time_point_sec& obj, bin_to_native_state& state, bool) {
     return read_raw(state.bin, state.error, obj.utc_seconds);
 }
 
 inline void native_to_bin(std::vector<char>& bin, const time_point_sec& obj) { native_to_bin(bin, obj.utc_seconds); }
 
-ABIRIX_NODISCARD inline bool json_to_native(time_point_sec& obj, json_to_native_state& state, event_type event,
+ABIRSN_NODISCARD inline bool json_to_native(time_point_sec& obj, json_to_native_state& state, event_type event,
                                             bool start) {
     return set_error(state, "can't convert time_point_sec");
 }
 
 template <typename State>
-ABIRIX_NODISCARD bool json_to_bin(time_point_sec*, State& state, bool, const abi_type*, event_type event, bool start) {
+ABIRSN_NODISCARD bool json_to_bin(time_point_sec*, State& state, bool, const abi_type*, event_type event, bool start) {
     if (event == event_type::received_string) {
         time_point_sec obj;
         if (!string_to_time_point_sec(obj, state.error, state.get_string().c_str()))
@@ -1181,7 +1181,7 @@ ABIRIX_NODISCARD bool json_to_bin(time_point_sec*, State& state, bool, const abi
         return set_error(state, "expected string containing time_point_sec");
 }
 
-ABIRIX_NODISCARD inline bool bin_to_json(time_point_sec*, bin_to_json_state& state, bool, const abi_type*, bool start) {
+ABIRSN_NODISCARD inline bool bin_to_json(time_point_sec*, bin_to_json_state& state, bool, const abi_type*, bool start) {
     time_point_sec v;
     if (!read_raw(state.bin, state.error, v))
         return false;
@@ -1195,7 +1195,7 @@ struct time_point {
     explicit operator std::string() const { return microseconds_to_str(microseconds); }
 };
 
-ABIRIX_NODISCARD inline bool string_to_time_point(time_point& dest, std::string& error, const std::string& s) {
+ABIRSN_NODISCARD inline bool string_to_time_point(time_point& dest, std::string& error, const std::string& s) {
     time_point_sec tps;
     if (!string_to_time_point_sec(tps, error, s.c_str()))
         return false;
@@ -1214,19 +1214,19 @@ ABIRIX_NODISCARD inline bool string_to_time_point(time_point& dest, std::string&
     return true;
 }
 
-ABIRIX_NODISCARD inline bool bin_to_native(time_point& obj, bin_to_native_state& state, bool) {
+ABIRSN_NODISCARD inline bool bin_to_native(time_point& obj, bin_to_native_state& state, bool) {
     return read_raw(state.bin, state.error, obj.microseconds);
 }
 
 inline void native_to_bin(std::vector<char>& bin, const time_point& obj) { native_to_bin(bin, obj.microseconds); }
 
-ABIRIX_NODISCARD inline bool json_to_native(time_point& obj, json_to_native_state& state, event_type event,
+ABIRSN_NODISCARD inline bool json_to_native(time_point& obj, json_to_native_state& state, event_type event,
                                             bool start) {
     return set_error(state, "can't convert time_point");
 }
 
 template <typename State>
-ABIRIX_NODISCARD bool json_to_bin(time_point*, State& state, bool, const abi_type*, event_type event, bool start) {
+ABIRSN_NODISCARD bool json_to_bin(time_point*, State& state, bool, const abi_type*, event_type event, bool start) {
     if (event == event_type::received_string) {
         time_point obj;
         if (!string_to_time_point(obj, state.error, state.get_string()))
@@ -1240,7 +1240,7 @@ ABIRIX_NODISCARD bool json_to_bin(time_point*, State& state, bool, const abi_typ
         return set_error(state, "expected string containing time_point");
 }
 
-ABIRIX_NODISCARD inline bool bin_to_json(time_point*, bin_to_json_state& state, bool, const abi_type*, bool start) {
+ABIRSN_NODISCARD inline bool bin_to_json(time_point*, bin_to_json_state& state, bool, const abi_type*, bool start) {
     time_point v;
     if (!read_raw(state.bin, state.error, v))
         return false;
@@ -1261,19 +1261,19 @@ struct block_timestamp {
     explicit operator std::string() const { return std::string{(time_point)(*this)}; }
 }; // block_timestamp
 
-ABIRIX_NODISCARD inline bool bin_to_native(block_timestamp& obj, bin_to_native_state& state, bool) {
+ABIRSN_NODISCARD inline bool bin_to_native(block_timestamp& obj, bin_to_native_state& state, bool) {
     return read_raw(state.bin, state.error, obj.slot);
 }
 
 inline void native_to_bin(std::vector<char>& bin, const block_timestamp& obj) { native_to_bin(bin, obj.slot); }
 
-ABIRIX_NODISCARD inline bool json_to_native(block_timestamp& obj, json_to_native_state& state, event_type event,
+ABIRSN_NODISCARD inline bool json_to_native(block_timestamp& obj, json_to_native_state& state, event_type event,
                                             bool start) {
     return set_error(state, "can't convert block_timestamp");
 }
 
 template <typename State>
-ABIRIX_NODISCARD bool json_to_bin(block_timestamp*, State& state, bool, const abi_type*, event_type event, bool start) {
+ABIRSN_NODISCARD bool json_to_bin(block_timestamp*, State& state, bool, const abi_type*, event_type event, bool start) {
     if (event == event_type::received_string) {
         time_point tp;
         if (!string_to_time_point(tp, state.error, state.get_string()))
@@ -1288,7 +1288,7 @@ ABIRIX_NODISCARD bool json_to_bin(block_timestamp*, State& state, bool, const ab
         return set_error(state, "expected string containing block_timestamp_type");
 }
 
-ABIRIX_NODISCARD inline bool bin_to_json(block_timestamp*, bin_to_json_state& state, bool, const abi_type*,
+ABIRSN_NODISCARD inline bool bin_to_json(block_timestamp*, bin_to_json_state& state, bool, const abi_type*,
                                          bool start) {
     uint32_t v;
     if (!read_raw(state.bin, state.error, v))
@@ -1301,7 +1301,7 @@ struct symbol_code {
     uint64_t value = 0;
 };
 
-ABIRIX_NODISCARD inline bool string_to_symbol_code(uint64_t& result, std::string& error, std::string_view str) {
+ABIRSN_NODISCARD inline bool string_to_symbol_code(uint64_t& result, std::string& error, std::string_view str) {
     while (!str.empty() && str.front() == ' ')
         str.remove_prefix(1);
     result = 0;
@@ -1325,7 +1325,7 @@ inline std::string symbol_code_to_string(uint64_t v) {
 }
 
 template <typename State>
-ABIRIX_NODISCARD bool json_to_bin(symbol_code*, State& state, bool, const abi_type*, event_type event, bool start) {
+ABIRSN_NODISCARD bool json_to_bin(symbol_code*, State& state, bool, const abi_type*, event_type event, bool start) {
     if (event == event_type::received_string) {
         auto& s = state.get_string();
         if (trace_json_to_bin)
@@ -1339,7 +1339,7 @@ ABIRIX_NODISCARD bool json_to_bin(symbol_code*, State& state, bool, const abi_ty
         return set_error(state, "expected string containing symbol_code");
 }
 
-ABIRIX_NODISCARD inline bool bin_to_json(symbol_code*, bin_to_json_state& state, bool, const abi_type*, bool start) {
+ABIRSN_NODISCARD inline bool bin_to_json(symbol_code*, bin_to_json_state& state, bool, const abi_type*, bool start) {
     symbol_code v;
     if (!read_raw(state.bin, state.error, v))
         return false;
@@ -1351,7 +1351,7 @@ struct symbol {
     uint64_t value = 0;
 };
 
-ABIRIX_NODISCARD inline bool string_to_symbol(uint64_t& result, std::string& error, uint8_t precision,
+ABIRSN_NODISCARD inline bool string_to_symbol(uint64_t& result, std::string& error, uint8_t precision,
                                               std::string_view str) {
     if (!string_to_symbol_code(result, error, str))
         return false;
@@ -1359,7 +1359,7 @@ ABIRIX_NODISCARD inline bool string_to_symbol(uint64_t& result, std::string& err
     return true;
 }
 
-ABIRIX_NODISCARD inline bool string_to_symbol(uint64_t& result, std::string& error, std::string_view str) {
+ABIRSN_NODISCARD inline bool string_to_symbol(uint64_t& result, std::string& error, std::string_view str) {
     uint8_t precision = 0;
     while (!str.empty() && str.front() >= '0' && str.front() <= '9') {
         precision = precision * 10 + (str.front() - '0');
@@ -1375,7 +1375,7 @@ inline std::string symbol_to_string(uint64_t v) {
 }
 
 template <typename State>
-ABIRIX_NODISCARD bool json_to_bin(symbol*, State& state, bool, const abi_type*, event_type event, bool start) {
+ABIRSN_NODISCARD bool json_to_bin(symbol*, State& state, bool, const abi_type*, event_type event, bool start) {
     if (event == event_type::received_string) {
         auto& s = state.get_string();
         if (trace_json_to_bin)
@@ -1389,7 +1389,7 @@ ABIRIX_NODISCARD bool json_to_bin(symbol*, State& state, bool, const abi_type*, 
         return set_error(state, "expected string containing symbol");
 }
 
-ABIRIX_NODISCARD inline bool bin_to_json(symbol*, bin_to_json_state& state, bool, const abi_type*, bool start) {
+ABIRSN_NODISCARD inline bool bin_to_json(symbol*, bin_to_json_state& state, bool, const abi_type*, bool start) {
     uint64_t v;
     if (!read_raw(state.bin, state.error, v))
         return false;
@@ -1402,7 +1402,7 @@ struct asset {
     symbol sym{};
 };
 
-ABIRIX_NODISCARD inline bool string_to_asset(asset& result, std::string& error, const char* s) {
+ABIRSN_NODISCARD inline bool string_to_asset(asset& result, std::string& error, const char* s) {
     // todo: check overflow
     while (*s == ' ')
         ++s;
@@ -1457,7 +1457,7 @@ inline std::string asset_to_string(const asset& v) {
 }
 
 template <typename State>
-ABIRIX_NODISCARD bool json_to_bin(asset*, State& state, bool, const abi_type*, event_type event, bool start) {
+ABIRSN_NODISCARD bool json_to_bin(asset*, State& state, bool, const abi_type*, event_type event, bool start) {
     if (event == event_type::received_string) {
         auto& s = state.get_string();
         if (trace_json_to_bin)
@@ -1472,7 +1472,7 @@ ABIRIX_NODISCARD bool json_to_bin(asset*, State& state, bool, const abi_type*, e
         return set_error(state, "expected string containing asset");
 }
 
-ABIRIX_NODISCARD inline bool bin_to_json(asset*, bin_to_json_state& state, bool, const abi_type*, bool start) {
+ABIRSN_NODISCARD inline bool bin_to_json(asset*, bin_to_json_state& state, bool, const abi_type*, bool start) {
     asset v{};
     if (!read_raw(state.bin, state.error, v.amount))
         return false;
@@ -1524,7 +1524,7 @@ constexpr void for_each_field(struct_def*, F f) {
 }
 
 struct action_def {
-    ::abirix::name name{};
+    ::ABIRSN::name name{};
     std::string type{};
     std::string ricardian_contract{};
 };
@@ -1537,7 +1537,7 @@ constexpr void for_each_field(action_def*, F f) {
 }
 
 struct table_def {
-    ::abirix::name name{};
+    ::ABIRSN::name name{};
     std::string index_type{};
     std::vector<std::string> key_names{};
     std::vector<std::string> key_types{};
@@ -1611,13 +1611,13 @@ constexpr void for_each_field(abi_def*, F f) {
     f("variants", member_ptr<&abi_def::variants>{});
 }
 
-ABIRIX_NODISCARD inline bool check_abi_version(const std::string& s, std::string& error) {
+ABIRSN_NODISCARD inline bool check_abi_version(const std::string& s, std::string& error) {
     if (s.substr(0, 13) != "arisen::abi/1.")
         return set_error(error, "unsupported abi version");
     return true;
 }
 
-ABIRIX_NODISCARD inline bool check_abi_version(input_buffer bin, std::string& error) {
+ABIRSN_NODISCARD inline bool check_abi_version(input_buffer bin, std::string& error) {
     std::string version;
     if (!read_string(bin, error, version))
         return false;
@@ -1628,10 +1628,10 @@ ABIRIX_NODISCARD inline bool check_abi_version(input_buffer bin, std::string& er
 // json_to_jvalue
 ///////////////////////////////////////////////////////////////////////////////
 
-ABIRIX_NODISCARD bool json_to_jobject(jvalue& value, json_to_jvalue_state& state, event_type event, bool start);
-ABIRIX_NODISCARD bool json_to_jarray(jvalue& value, json_to_jvalue_state& state, event_type event, bool start);
+ABIRSN_NODISCARD bool json_to_jobject(jvalue& value, json_to_jvalue_state& state, event_type event, bool start);
+ABIRSN_NODISCARD bool json_to_jarray(jvalue& value, json_to_jvalue_state& state, event_type event, bool start);
 
-ABIRIX_NODISCARD inline bool receive_event(struct json_to_jvalue_state& state, event_type event, bool start) {
+ABIRSN_NODISCARD inline bool receive_event(struct json_to_jvalue_state& state, event_type event, bool start) {
     if (state.stack.empty())
         return set_error(state, "extra data");
     if (state.stack.size() > max_stack_size)
@@ -1667,7 +1667,7 @@ ABIRIX_NODISCARD inline bool receive_event(struct json_to_jvalue_state& state, e
     return true;
 }
 
-ABIRIX_NODISCARD inline bool json_to_jvalue(jvalue& value, std::string& error, std::string_view json) {
+ABIRSN_NODISCARD inline bool json_to_jvalue(jvalue& value, std::string& error, std::string_view json) {
     std::string mutable_json{json};
     mutable_json.push_back(0);
     json_to_jvalue_state state{.error = error};
@@ -1678,7 +1678,7 @@ ABIRIX_NODISCARD inline bool json_to_jvalue(jvalue& value, std::string& error, s
                         rapidjson::kParseNumbersAsStringsFlag>(ss, state);
 }
 
-ABIRIX_NODISCARD inline bool json_to_jobject(jvalue& value, json_to_jvalue_state& state, event_type event, bool start) {
+ABIRSN_NODISCARD inline bool json_to_jobject(jvalue& value, json_to_jvalue_state& state, event_type event, bool start) {
     if (start) {
         if (event != event_type::received_start_object)
             return set_error(state, "expected object");
@@ -1705,7 +1705,7 @@ ABIRIX_NODISCARD inline bool json_to_jobject(jvalue& value, json_to_jvalue_state
     }
 }
 
-ABIRIX_NODISCARD inline bool json_to_jarray(jvalue& value, json_to_jvalue_state& state, event_type event, bool start) {
+ABIRSN_NODISCARD inline bool json_to_jarray(jvalue& value, json_to_jvalue_state& state, event_type event, bool start) {
     if (start) {
         if (event != event_type::received_start_array)
             return set_error(state, "expected array");
@@ -1733,13 +1733,13 @@ ABIRIX_NODISCARD inline bool json_to_jarray(jvalue& value, json_to_jvalue_state&
 
 template <typename T>
 struct native_serializer_impl : native_serializer {
-    ABIRIX_NODISCARD bool bin_to_native(void* v, bin_to_native_state& state, bool start) const override {
-        using ::abirix::bin_to_native;
+    ABIRSN_NODISCARD bool bin_to_native(void* v, bin_to_native_state& state, bool start) const override {
+        using ::ABIRSN::bin_to_native;
         return bin_to_native(*reinterpret_cast<T*>(v), state, start);
     }
-    ABIRIX_NODISCARD bool json_to_native(void* v, json_to_native_state& state, event_type event,
+    ABIRSN_NODISCARD bool json_to_native(void* v, json_to_native_state& state, event_type event,
                                          bool start) const override {
-        using ::abirix::json_to_native;
+        using ::ABIRSN::json_to_native;
         return json_to_native(*reinterpret_cast<T*>(v), state, event, start);
     }
 };
@@ -1750,13 +1750,13 @@ inline constexpr auto native_serializer_for = native_serializer_impl<T>{};
 template <typename member_ptr>
 constexpr auto create_native_field_serializer_methods_impl() {
     struct impl : native_field_serializer_methods {
-        ABIRIX_NODISCARD bool bin_to_native(void* v, bin_to_native_state& state, bool start) const override {
-            using ::abirix::bin_to_native;
+        ABIRSN_NODISCARD bool bin_to_native(void* v, bin_to_native_state& state, bool start) const override {
+            using ::ABIRSN::bin_to_native;
             return bin_to_native(member_from_void(member_ptr{}, v), state, start);
         }
-        ABIRIX_NODISCARD bool json_to_native(void* v, json_to_native_state& state, event_type event,
+        ABIRSN_NODISCARD bool json_to_native(void* v, json_to_native_state& state, event_type event,
                                              bool start) const override {
-            using ::abirix::json_to_native;
+            using ::ABIRSN::json_to_native;
             return json_to_native(member_from_void(member_ptr{}, v), state, event, start);
         }
     };
@@ -1789,7 +1789,7 @@ inline constexpr auto native_field_serializers_for = create_native_field_seriali
 ///////////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-ABIRIX_NODISCARD bool bin_to_native(T& obj, std::string& error, input_buffer& bin) {
+ABIRSN_NODISCARD bool bin_to_native(T& obj, std::string& error, input_buffer& bin) {
     bin_to_native_state state{error, bin};
     if (!native_serializer_for<T>.bin_to_native(&obj, state, true))
         return false;
@@ -1804,13 +1804,13 @@ ABIRIX_NODISCARD bool bin_to_native(T& obj, std::string& error, input_buffer& bi
 }
 
 template <typename T>
-ABIRIX_NODISCARD auto bin_to_native(T& obj, bin_to_native_state& state, bool start)
+ABIRSN_NODISCARD auto bin_to_native(T& obj, bin_to_native_state& state, bool start)
     -> std::enable_if_t<std::is_arithmetic_v<T>, bool> {
     return read_raw(state.bin, state.error, obj);
 }
 
 template <typename T>
-ABIRIX_NODISCARD auto bin_to_native(T& obj, bin_to_native_state& state, bool start)
+ABIRSN_NODISCARD auto bin_to_native(T& obj, bin_to_native_state& state, bool start)
     -> std::enable_if_t<std::is_class_v<T>, bool> {
     if (start) {
         if (trace_bin_to_native)
@@ -1835,7 +1835,7 @@ ABIRIX_NODISCARD auto bin_to_native(T& obj, bin_to_native_state& state, bool sta
 }
 
 template <typename T>
-ABIRIX_NODISCARD bool bin_to_native(std::vector<T>& v, bin_to_native_state& state, bool start) {
+ABIRSN_NODISCARD bool bin_to_native(std::vector<T>& v, bin_to_native_state& state, bool start) {
     if (start) {
         v.clear();
         uint32_t size;
@@ -1864,7 +1864,7 @@ ABIRIX_NODISCARD bool bin_to_native(std::vector<T>& v, bin_to_native_state& stat
 }
 
 template <typename First, typename Second>
-ABIRIX_NODISCARD bool bin_to_native(std::pair<First, Second>& obj, bin_to_native_state& state, bool start) {
+ABIRSN_NODISCARD bool bin_to_native(std::pair<First, Second>& obj, bin_to_native_state& state, bool start) {
     if (start) {
         if (trace_bin_to_native)
             printf("%*s[ pair\n", int(state.stack.size() * 4), "");
@@ -1890,7 +1890,7 @@ ABIRIX_NODISCARD bool bin_to_native(std::pair<First, Second>& obj, bin_to_native
     }
 }
 
-ABIRIX_NODISCARD inline bool bin_to_native(std::string& obj, bin_to_native_state& state, bool) {
+ABIRSN_NODISCARD inline bool bin_to_native(std::string& obj, bin_to_native_state& state, bool) {
     uint32_t size;
     if (!read_varuint32(state.bin, state.error, size))
         return false;
@@ -1901,7 +1901,7 @@ ABIRIX_NODISCARD inline bool bin_to_native(std::string& obj, bin_to_native_state
 }
 
 template <typename T>
-ABIRIX_NODISCARD bool bin_to_native(std::optional<T>& obj, bin_to_native_state& state, bool) {
+ABIRSN_NODISCARD bool bin_to_native(std::optional<T>& obj, bin_to_native_state& state, bool) {
     bool present;
     if (!read_raw(state.bin, state.error, present))
         return false;
@@ -1914,7 +1914,7 @@ ABIRIX_NODISCARD bool bin_to_native(std::optional<T>& obj, bin_to_native_state& 
 }
 
 template <uint32_t I, typename... Ts>
-ABIRIX_NODISCARD bool bin_to_native_variant(std::variant<Ts...>& v, bin_to_native_state& state, uint32_t i) {
+ABIRSN_NODISCARD bool bin_to_native_variant(std::variant<Ts...>& v, bin_to_native_state& state, uint32_t i) {
     if constexpr (I < std::variant_size_v<std::variant<Ts...>>) {
         if (i == I) {
             auto& x = v.template emplace<std::variant_alternative_t<I, std::variant<Ts...>>>();
@@ -1928,7 +1928,7 @@ ABIRIX_NODISCARD bool bin_to_native_variant(std::variant<Ts...>& v, bin_to_nativ
 }
 
 template <typename... Ts>
-ABIRIX_NODISCARD bool bin_to_native(std::variant<Ts...>& obj, bin_to_native_state& state, bool) {
+ABIRSN_NODISCARD bool bin_to_native(std::variant<Ts...>& obj, bin_to_native_state& state, bool) {
     uint32_t u;
     if (!read_varuint32(state.bin, state.error, u))
         return false;
@@ -1936,7 +1936,7 @@ ABIRIX_NODISCARD bool bin_to_native(std::variant<Ts...>& obj, bin_to_native_stat
 }
 
 template <typename T>
-ABIRIX_NODISCARD bool bin_to_native(might_not_exist<T>& obj, bin_to_native_state& state, bool start) {
+ABIRSN_NODISCARD bool bin_to_native(might_not_exist<T>& obj, bin_to_native_state& state, bool start) {
     if (state.bin.pos != state.bin.end)
         return bin_to_native(obj.value, state, start);
     return true;
@@ -1981,7 +1981,7 @@ void native_to_bin(std::vector<char>& bin, const std::vector<T>& obj) {
 // json_to_native
 ///////////////////////////////////////////////////////////////////////////////
 
-ABIRIX_NODISCARD inline bool receive_event(struct json_to_native_state& state, event_type event, bool start) {
+ABIRSN_NODISCARD inline bool receive_event(struct json_to_native_state& state, event_type event, bool start) {
     if (state.stack.empty())
         return set_error(state, "extra data");
     if (state.stack.size() > max_stack_size)
@@ -1995,7 +1995,7 @@ ABIRIX_NODISCARD inline bool receive_event(struct json_to_native_state& state, e
 }
 
 template <typename T>
-ABIRIX_NODISCARD bool json_to_native(T& obj, std::string& error, std::string_view json) {
+ABIRSN_NODISCARD bool json_to_native(T& obj, std::string& error, std::string_view json) {
     std::string mutable_json{json};
     mutable_json.push_back(0);
     json_to_native_state state{.error = error};
@@ -2007,14 +2007,14 @@ ABIRIX_NODISCARD bool json_to_native(T& obj, std::string& error, std::string_vie
 }
 
 template <typename T>
-ABIRIX_NODISCARD auto json_to_native(T& obj, json_to_native_state& state, event_type event, bool start)
+ABIRSN_NODISCARD auto json_to_native(T& obj, json_to_native_state& state, event_type event, bool start)
     -> std::enable_if_t<std::is_arithmetic_v<T>, bool> {
 
     return json_to_number(obj, state, event);
 }
 
 template <typename T>
-ABIRIX_NODISCARD auto json_to_native(T& obj, json_to_native_state& state, event_type event, bool start)
+ABIRSN_NODISCARD auto json_to_native(T& obj, json_to_native_state& state, event_type event, bool start)
     -> std::enable_if_t<std::is_class_v<T>, bool> {
 
     if (start) {
@@ -2052,7 +2052,7 @@ ABIRIX_NODISCARD auto json_to_native(T& obj, json_to_native_state& state, event_
 }
 
 template <typename T>
-ABIRIX_NODISCARD bool json_to_native(std::vector<T>& v, json_to_native_state& state, event_type event, bool start) {
+ABIRSN_NODISCARD bool json_to_native(std::vector<T>& v, json_to_native_state& state, event_type event, bool start) {
     if (start) {
         if (event != event_type::received_start_array)
             return set_error(state, "expected array");
@@ -2073,12 +2073,12 @@ ABIRIX_NODISCARD bool json_to_native(std::vector<T>& v, json_to_native_state& st
 }
 
 template <typename First, typename Second>
-ABIRIX_NODISCARD bool json_to_native(std::pair<First, Second>& obj, json_to_native_state& state, event_type event,
+ABIRSN_NODISCARD bool json_to_native(std::pair<First, Second>& obj, json_to_native_state& state, event_type event,
                                      bool start) {
     return set_error(state, "pair not implemented"); // TODO
 }
 
-ABIRIX_NODISCARD inline bool json_to_native(std::string& obj, json_to_native_state& state, event_type event,
+ABIRSN_NODISCARD inline bool json_to_native(std::string& obj, json_to_native_state& state, event_type event,
                                             bool start) {
     if (event == event_type::received_string) {
         obj = state.get_string();
@@ -2090,7 +2090,7 @@ ABIRIX_NODISCARD inline bool json_to_native(std::string& obj, json_to_native_sta
 }
 
 template <typename T>
-ABIRIX_NODISCARD bool json_to_native(std::optional<T>& obj, json_to_native_state& state, event_type event, bool) {
+ABIRSN_NODISCARD bool json_to_native(std::optional<T>& obj, json_to_native_state& state, event_type event, bool) {
     if (event == event_type::received_null)
         return true;
     obj.emplace();
@@ -2098,12 +2098,12 @@ ABIRIX_NODISCARD bool json_to_native(std::optional<T>& obj, json_to_native_state
 }
 
 template <typename... Ts>
-ABIRIX_NODISCARD bool json_to_native(std::variant<Ts...>& obj, json_to_native_state& state, event_type event, bool) {
+ABIRSN_NODISCARD bool json_to_native(std::variant<Ts...>& obj, json_to_native_state& state, event_type event, bool) {
     return set_error(state, "can not convert json to variant");
 }
 
 template <typename T>
-ABIRIX_NODISCARD bool json_to_native(might_not_exist<T>& obj, json_to_native_state& state, event_type event,
+ABIRSN_NODISCARD bool json_to_native(might_not_exist<T>& obj, json_to_native_state& state, event_type event,
                                      bool start) {
     return json_to_native(obj.value, state, event, start);
 }
@@ -2152,17 +2152,17 @@ constexpr void for_each_abi_type(F f) {
 
 template <typename T>
 struct abi_serializer_impl : abi_serializer {
-    ABIRIX_NODISCARD bool json_to_bin(jvalue_to_bin_state& state, bool allow_extensions, const abi_type* type,
+    ABIRSN_NODISCARD bool json_to_bin(jvalue_to_bin_state& state, bool allow_extensions, const abi_type* type,
                                       event_type event, bool start) const override {
-        return ::abiRIX::json_to_bin((T*)nullptr, state, allow_extensions, type, event, start);
+        return ::ABIRSN::json_to_bin((T*)nullptr, state, allow_extensions, type, event, start);
     }
-    ABIRIX_NODISCARD bool json_to_bin(json_to_bin_state& state, bool allow_extensions, const abi_type* type,
+    ABIRSN_NODISCARD bool json_to_bin(json_to_bin_state& state, bool allow_extensions, const abi_type* type,
                                       event_type event, bool start) const override {
-        return ::abiRIX::json_to_bin((T*)nullptr, state, allow_extensions, type, event, start);
+        return ::ABIRSN::json_to_bin((T*)nullptr, state, allow_extensions, type, event, start);
     }
-    ABIRIX_NODISCARD bool bin_to_json(bin_to_json_state& state, bool allow_extensions, const abi_type* type,
+    ABIRSN_NODISCARD bool bin_to_json(bin_to_json_state& state, bool allow_extensions, const abi_type* type,
                                       bool start) const override {
-        return ::abiRIX::bin_to_json((T*)nullptr, state, allow_extensions, type, start);
+        return ::ABIRSN::bin_to_json((T*)nullptr, state, allow_extensions, type, start);
     }
 };
 
@@ -2181,8 +2181,8 @@ struct abi_field {
 struct abi_type {
     std::string name{};
     std::string alias_of_name{};
-    const ::abirix::struct_def* struct_def{};
-    const ::abirix::variant_def* variant_def{};
+    const ::ABIRSN::struct_def* struct_def{};
+    const ::ABIRSN::variant_def* variant_def{};
     abi_type* alias_of{};
     abi_type* optional_of{};
     abi_type* extension_of{};
@@ -2204,7 +2204,7 @@ bool ends_with(const std::string& s, const char (&suffix)[i]) {
     return s.size() >= i - 1 && !strcmp(s.c_str() + s.size() - (i - 1), suffix);
 }
 
-ABIRIX_NODISCARD inline bool get_type(abi_type*& result, std::string& error, std::map<std::string, abi_type>& abi_types,
+ABIRSN_NODISCARD inline bool get_type(abi_type*& result, std::string& error, std::map<std::string, abi_type>& abi_types,
                                       const std::string& name, int depth) {
     if (depth >= 32)
         return set_error(error, "abi recursion limit reached");
@@ -2258,7 +2258,7 @@ ABIRIX_NODISCARD inline bool get_type(abi_type*& result, std::string& error, std
     return true;
 }
 
-ABIRIX_NODISCARD inline bool fill_struct(std::map<std::string, abi_type>& abi_types, std::string& error, abi_type& type,
+ABIRSN_NODISCARD inline bool fill_struct(std::map<std::string, abi_type>& abi_types, std::string& error, abi_type& type,
                                          int depth) {
     if (depth >= 32)
         return set_error(error, "abi recursion limit reached");
@@ -2284,7 +2284,7 @@ ABIRIX_NODISCARD inline bool fill_struct(std::map<std::string, abi_type>& abi_ty
     return true;
 }
 
-ABIRIX_NODISCARD inline bool fill_variant(std::map<std::string, abi_type>& abi_types, std::string& error,
+ABIRSN_NODISCARD inline bool fill_variant(std::map<std::string, abi_type>& abi_types, std::string& error,
                                           abi_type& type, int depth) {
     if (depth >= 32)
         return set_error(error, "abi recursion limit reached");
@@ -2302,7 +2302,7 @@ ABIRIX_NODISCARD inline bool fill_variant(std::map<std::string, abi_type>& abi_t
     return true;
 }
 
-ABIRIX_NODISCARD inline bool fill_contract(contract& c, std::string& error, const abi_def& abi) {
+ABIRSN_NODISCARD inline bool fill_contract(contract& c, std::string& error, const abi_def& abi) {
     for (auto& a : abi.actions)
         c.action_types[a.name] = a.type;
     for_each_abi_type([&](const char* name, auto* p) {
@@ -2376,7 +2376,7 @@ ABIRIX_NODISCARD inline bool fill_contract(contract& c, std::string& error, cons
 // json_to_bin (jvalue)
 ///////////////////////////////////////////////////////////////////////////////
 
-ABIRIX_NODISCARD inline bool json_to_bin(std::vector<char>& bin, std::string& error, const abi_type* type,
+ABIRSN_NODISCARD inline bool json_to_bin(std::vector<char>& bin, std::string& error, const abi_type* type,
                                          const jvalue& value) {
     jvalue_to_bin_state state{error, bin, &value};
     bool result = [&] {
@@ -2415,7 +2415,7 @@ ABIRIX_NODISCARD inline bool json_to_bin(std::vector<char>& bin, std::string& er
     return false;
 }
 
-ABIRIX_NODISCARD inline bool json_to_bin(pseudo_optional*, jvalue_to_bin_state& state, bool allow_extensions,
+ABIRSN_NODISCARD inline bool json_to_bin(pseudo_optional*, jvalue_to_bin_state& state, bool allow_extensions,
                                          const abi_type* type, event_type event, bool) {
     if (event == event_type::received_null) {
         state.bin.push_back(0);
@@ -2426,13 +2426,13 @@ ABIRIX_NODISCARD inline bool json_to_bin(pseudo_optional*, jvalue_to_bin_state& 
            type->optional_of->ser->json_to_bin(state, allow_extensions, type->optional_of, event, true);
 }
 
-ABIRIX_NODISCARD inline bool json_to_bin(pseudo_extension*, jvalue_to_bin_state& state, bool allow_extensions,
+ABIRSN_NODISCARD inline bool json_to_bin(pseudo_extension*, jvalue_to_bin_state& state, bool allow_extensions,
                                          const abi_type* type, event_type event, bool) {
     return type->extension_of->ser &&
            type->extension_of->ser->json_to_bin(state, allow_extensions, type->extension_of, event, true);
 }
 
-ABIRIX_NODISCARD inline bool json_to_bin(pseudo_object*, jvalue_to_bin_state& state, bool allow_extensions,
+ABIRSN_NODISCARD inline bool json_to_bin(pseudo_object*, jvalue_to_bin_state& state, bool allow_extensions,
                                          const abi_type* type, event_type event, bool start) {
     if (start) {
         if (!state.received_value || !std::holds_alternative<jobject>(state.received_value->value))
@@ -2472,7 +2472,7 @@ ABIRIX_NODISCARD inline bool json_to_bin(pseudo_object*, jvalue_to_bin_state& st
                                                            field.type, get_event_type(it->second), true);
 }
 
-ABIRIX_NODISCARD inline bool json_to_bin(pseudo_array*, jvalue_to_bin_state& state, bool, const abi_type* type,
+ABIRSN_NODISCARD inline bool json_to_bin(pseudo_array*, jvalue_to_bin_state& state, bool, const abi_type* type,
                                          event_type event, bool start) {
     if (start) {
         if (!state.received_value || !std::holds_alternative<jarray>(state.received_value->value))
@@ -2500,7 +2500,7 @@ ABIRIX_NODISCARD inline bool json_to_bin(pseudo_array*, jvalue_to_bin_state& sta
            type->array_of->ser->json_to_bin(state, false, type->array_of, get_event_type(*state.received_value), true);
 }
 
-ABIRIX_NODISCARD inline bool json_to_bin(pseudo_variant*, jvalue_to_bin_state& state, bool allow_extensions,
+ABIRSN_NODISCARD inline bool json_to_bin(pseudo_variant*, jvalue_to_bin_state& state, bool allow_extensions,
                                          const abi_type* type, event_type event, bool start) {
     if (start) {
         if (!state.received_value || !std::holds_alternative<jarray>(state.received_value->value))
@@ -2537,7 +2537,7 @@ ABIRIX_NODISCARD inline bool json_to_bin(pseudo_variant*, jvalue_to_bin_state& s
 }
 
 template <typename T>
-ABIRIX_NODISCARD auto json_to_bin(T*, jvalue_to_bin_state& state, bool, const abi_type*, event_type event, bool start)
+ABIRSN_NODISCARD auto json_to_bin(T*, jvalue_to_bin_state& state, bool, const abi_type*, event_type event, bool start)
     -> std::enable_if_t<std::is_arithmetic_v<T>, bool> {
 
     T x;
@@ -2547,7 +2547,7 @@ ABIRIX_NODISCARD auto json_to_bin(T*, jvalue_to_bin_state& state, bool, const ab
     return true;
 }
 
-ABIRIX_NODISCARD inline bool json_to_bin(std::string*, jvalue_to_bin_state& state, bool, const abi_type*,
+ABIRSN_NODISCARD inline bool json_to_bin(std::string*, jvalue_to_bin_state& state, bool, const abi_type*,
                                          event_type event, bool start) {
     if (event == event_type::received_string) {
         auto& s = state.get_string();
@@ -2564,7 +2564,7 @@ ABIRIX_NODISCARD inline bool json_to_bin(std::string*, jvalue_to_bin_state& stat
 // json_to_bin
 ///////////////////////////////////////////////////////////////////////////////
 
-ABIRIX_NODISCARD inline bool receive_event(struct json_to_bin_state& state, event_type event, bool start) {
+ABIRSN_NODISCARD inline bool receive_event(struct json_to_bin_state& state, event_type event, bool start) {
     if (state.stack.empty())
         return false;
     if (trace_json_to_bin_event)
@@ -2578,7 +2578,7 @@ ABIRIX_NODISCARD inline bool receive_event(struct json_to_bin_state& state, even
     return type->ser && type->ser->json_to_bin(state, entry.allow_extensions, type, event, start);
 }
 
-ABIRIX_NODISCARD inline bool json_to_bin(std::vector<char>& bin, std::string& error, const abi_type* type,
+ABIRSN_NODISCARD inline bool json_to_bin(std::vector<char>& bin, std::string& error, const abi_type* type,
                                          std::string_view json) {
     std::string mutable_json{json};
     mutable_json.push_back(0);
@@ -2624,7 +2624,7 @@ ABIRIX_NODISCARD inline bool json_to_bin(std::vector<char>& bin, std::string& er
     return true;
 }
 
-ABIRIX_NODISCARD inline bool json_to_bin(pseudo_optional*, json_to_bin_state& state, bool allow_extensions,
+ABIRSN_NODISCARD inline bool json_to_bin(pseudo_optional*, json_to_bin_state& state, bool allow_extensions,
                                          const abi_type* type, event_type event, bool) {
     if (event == event_type::received_null) {
         state.bin.push_back(0);
@@ -2635,13 +2635,13 @@ ABIRIX_NODISCARD inline bool json_to_bin(pseudo_optional*, json_to_bin_state& st
            type->optional_of->ser->json_to_bin(state, allow_extensions, type->optional_of, event, true);
 }
 
-ABIRIX_NODISCARD inline bool json_to_bin(pseudo_extension*, json_to_bin_state& state, bool allow_extensions,
+ABIRSN_NODISCARD inline bool json_to_bin(pseudo_extension*, json_to_bin_state& state, bool allow_extensions,
                                          const abi_type* type, event_type event, bool) {
     return type->extension_of->ser &&
            type->extension_of->ser->json_to_bin(state, allow_extensions, type->extension_of, event, true);
 }
 
-ABIRIX_NODISCARD inline bool json_to_bin(pseudo_object*, json_to_bin_state& state, bool allow_extensions,
+ABIRSN_NODISCARD inline bool json_to_bin(pseudo_object*, json_to_bin_state& state, bool allow_extensions,
                                          const abi_type* type, event_type event, bool start) {
     if (start) {
         if (event != event_type::received_start_object)
@@ -2689,7 +2689,7 @@ ABIRIX_NODISCARD inline bool json_to_bin(pseudo_object*, json_to_bin_state& stat
     }
 }
 
-ABIRIX_NODISCARD inline bool json_to_bin(pseudo_array*, json_to_bin_state& state, bool, const abi_type* type,
+ABIRSN_NODISCARD inline bool json_to_bin(pseudo_array*, json_to_bin_state& state, bool, const abi_type* type,
                                          event_type event, bool start) {
     if (start) {
         if (event != event_type::received_start_array)
@@ -2715,7 +2715,7 @@ ABIRIX_NODISCARD inline bool json_to_bin(pseudo_array*, json_to_bin_state& state
     return type->array_of->ser && type->array_of->ser->json_to_bin(state, false, type->array_of, event, true);
 }
 
-ABIRIX_NODISCARD inline bool json_to_bin(pseudo_variant*, json_to_bin_state& state, bool allow_extensions,
+ABIRSN_NODISCARD inline bool json_to_bin(pseudo_variant*, json_to_bin_state& state, bool allow_extensions,
                                          const abi_type* type, event_type event, bool start) {
     if (start) {
         if (event != event_type::received_start_array)
@@ -2758,7 +2758,7 @@ ABIRIX_NODISCARD inline bool json_to_bin(pseudo_variant*, json_to_bin_state& sta
 }
 
 template <typename T>
-ABIRIX_NODISCARD auto json_to_bin(T*, json_to_bin_state& state, bool, const abi_type*, event_type event, bool start)
+ABIRSN_NODISCARD auto json_to_bin(T*, json_to_bin_state& state, bool, const abi_type*, event_type event, bool start)
     -> std::enable_if_t<std::is_arithmetic_v<T>, bool> {
 
     T x;
@@ -2768,7 +2768,7 @@ ABIRIX_NODISCARD auto json_to_bin(T*, json_to_bin_state& state, bool, const abi_
     return true;
 }
 
-ABIRIX_NODISCARD inline bool json_to_bin(std::string*, json_to_bin_state& state, bool, const abi_type*,
+ABIRSN_NODISCARD inline bool json_to_bin(std::string*, json_to_bin_state& state, bool, const abi_type*,
                                          event_type event, bool start) {
     if (event == event_type::received_string) {
         auto& s = state.get_string();
@@ -2785,7 +2785,7 @@ ABIRIX_NODISCARD inline bool json_to_bin(std::string*, json_to_bin_state& state,
 // bin_to_json
 ///////////////////////////////////////////////////////////////////////////////
 
-ABIRIX_NODISCARD inline bool bin_to_json(input_buffer& bin, std::string& error, const abi_type* type,
+ABIRSN_NODISCARD inline bool bin_to_json(input_buffer& bin, std::string& error, const abi_type* type,
                                          std::string& dest) {
     if (!type->ser)
         return false;
@@ -2805,7 +2805,7 @@ ABIRIX_NODISCARD inline bool bin_to_json(input_buffer& bin, std::string& error, 
     return true;
 }
 
-ABIRIX_NODISCARD inline bool bin_to_json(pseudo_optional*, bin_to_json_state& state, bool allow_extensions,
+ABIRSN_NODISCARD inline bool bin_to_json(pseudo_optional*, bin_to_json_state& state, bool allow_extensions,
                                          const abi_type* type, bool) {
     bool present;
     if (!read_raw(state.bin, state.error, present))
@@ -2817,13 +2817,13 @@ ABIRIX_NODISCARD inline bool bin_to_json(pseudo_optional*, bin_to_json_state& st
     return true;
 }
 
-ABIRIX_NODISCARD inline bool bin_to_json(pseudo_extension*, bin_to_json_state& state, bool allow_extensions,
+ABIRSN_NODISCARD inline bool bin_to_json(pseudo_extension*, bin_to_json_state& state, bool allow_extensions,
                                          const abi_type* type, bool) {
     return type->extension_of->ser &&
            type->extension_of->ser->bin_to_json(state, allow_extensions, type->extension_of, true);
 }
 
-ABIRIX_NODISCARD inline bool bin_to_json(pseudo_object*, bin_to_json_state& state, bool allow_extensions,
+ABIRSN_NODISCARD inline bool bin_to_json(pseudo_object*, bin_to_json_state& state, bool allow_extensions,
                                          const abi_type* type, bool start) {
     if (start) {
         if (trace_bin_to_json)
@@ -2854,7 +2854,7 @@ ABIRIX_NODISCARD inline bool bin_to_json(pseudo_object*, bin_to_json_state& stat
     }
 }
 
-ABIRIX_NODISCARD inline bool bin_to_json(pseudo_array*, bin_to_json_state& state, bool, const abi_type* type,
+ABIRSN_NODISCARD inline bool bin_to_json(pseudo_array*, bin_to_json_state& state, bool, const abi_type* type,
                                          bool start) {
     if (start) {
         state.stack.push_back({type, false});
@@ -2880,7 +2880,7 @@ ABIRIX_NODISCARD inline bool bin_to_json(pseudo_array*, bin_to_json_state& state
     }
 }
 
-ABIRIX_NODISCARD inline bool bin_to_json(pseudo_variant*, bin_to_json_state& state, bool allow_extensions,
+ABIRSN_NODISCARD inline bool bin_to_json(pseudo_variant*, bin_to_json_state& state, bool allow_extensions,
                                          const abi_type* type, bool start) {
     if (start) {
         state.stack.push_back({type, allow_extensions});
@@ -2910,7 +2910,7 @@ ABIRIX_NODISCARD inline bool bin_to_json(pseudo_variant*, bin_to_json_state& sta
 }
 
 template <typename T>
-ABIRIX_NODISCARD auto bin_to_json(T*, bin_to_json_state& state, bool, const abi_type*, bool start)
+ABIRSN_NODISCARD auto bin_to_json(T*, bin_to_json_state& state, bool, const abi_type*, bool start)
     -> std::enable_if_t<std::is_arithmetic_v<T>, bool> {
 
     T v;
@@ -2930,7 +2930,7 @@ ABIRIX_NODISCARD auto bin_to_json(T*, bin_to_json_state& state, bool, const abi_
     }
 }
 
-ABIRIX_NODISCARD inline bool bin_to_json(std::string*, bin_to_json_state& state, bool, const abi_type*, bool start) {
+ABIRSN_NODISCARD inline bool bin_to_json(std::string*, bin_to_json_state& state, bool, const abi_type*, bool start) {
     std::string s;
     if (!read_string(state.bin, state.error, s))
         return false;
@@ -2941,4 +2941,4 @@ inline namespace literals {
 inline constexpr name operator""_n(const char* s, size_t) { return name{s}; }
 } // namespace literals
 
-} // namespace abirix
+} // namespace ABIRSN

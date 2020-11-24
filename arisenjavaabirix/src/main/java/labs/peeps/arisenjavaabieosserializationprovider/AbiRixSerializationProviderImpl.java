@@ -1,25 +1,25 @@
-package one.block.arisenjavaabirixserializationprovider;
+package labs.peeps.arisenjavaABIRSNserializationprovider;
 
-import one.block.arisenjava.interfaces.ISerializationProvider;
-import one.block.arisenjava.models.AbiRixSerializationObject;
+import labs.peeps.arisenjava.interfaces.ISerializationProvider;
+import labs.peeps.arisenjava.models.ABIRSNSerializationObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import android.util.Log;
 
 import java.nio.ByteBuffer;
 import java.util.Map;
-import one.block.arisenjava.error.serializationProvider.*;
+import labs.peeps.arisenjava.error.serializationProvider.*;
 
 /**
  * Implementation of ISerializationProvider based on a native C++ transformation process
  * compiled via the NDK for Android.
  */
-public class AbiRixSerializationProviderImpl implements ISerializationProvider {
+public class ABIRSNSerializationProviderImpl implements ISerializationProvider {
     static {
-        System.loadLibrary("abirix-lib");
+        System.loadLibrary("ABIRSN-lib");
     }
 
-    public native String stringFromAbiRix();
+    public native String stringFromABIRSN();
     public native ByteBuffer create();
     public native void destroy(ByteBuffer context);
     public native String getError(ByteBuffer context);
@@ -35,26 +35,26 @@ public class AbiRixSerializationProviderImpl implements ISerializationProvider {
 
     private ByteBuffer context;
 
-    private String TAG = "AbiRixSerializationProviderImpl";
+    private String TAG = "ABIRSNSerializationProviderImpl";
     private static final String NULL_CONTEXT_ERR_MSG = "Null context!  Has destroyContext() already been called?";
-    private static final String CANNOT_CREATE_CONTEXT_ERR_MSG = "Could not create abirix context.";
+    private static final String CANNOT_CREATE_CONTEXT_ERR_MSG = "Could not create ABIRSN context.";
 
     /**
-     * Create a new AbiRixSerializationProviderImpl serialization provider instance, initilizing a new context for the C++
+     * Create a new ABIRSNSerializationProviderImpl serialization provider instance, initilizing a new context for the C++
      * library to work on automatically.
      *
      * @throws SerializationProviderError - An error is thrown if the context cannot be created.
      */
-    public AbiRixSerializationProviderImpl() throws SerializationProviderError {
+    public ABIRSNSerializationProviderImpl() throws SerializationProviderError {
         context = create();
         if (null == context) {
-            throw new AbirixContextNullError(CANNOT_CREATE_CONTEXT_ERR_MSG);
+            throw new ABIRSNContextNullError(CANNOT_CREATE_CONTEXT_ERR_MSG);
         }
     }
 
     /**
      * Destroy the underlying C++ context, freeing the heap memory that was allocated for it.
-     * This method should always be called before letting the AbiRixSerializationProviderImpl instance go out of scope
+     * This method should always be called before letting the ABIRSNSerializationProviderImpl instance go out of scope
      * to avoid leaking memory.
      */
     public void destroyContext() {
@@ -73,7 +73,7 @@ public class AbiRixSerializationProviderImpl implements ISerializationProvider {
      * @throws SerializationProviderError - An error is thrown if the context cannot be created.
      */
     public long stringToName64(@Nullable String str) throws SerializationProviderError {
-        if (null == context) throw new AbirixContextNullError(NULL_CONTEXT_ERR_MSG);
+        if (null == context) throw new ABIRSNContextNullError(NULL_CONTEXT_ERR_MSG);
         return stringToName(context, str);
     }
 
@@ -85,7 +85,7 @@ public class AbiRixSerializationProviderImpl implements ISerializationProvider {
      */
     @NotNull
     public String name64ToString(long name) throws SerializationProviderError {
-        if (null == context) throw new AbirixContextNullError(NULL_CONTEXT_ERR_MSG);
+        if (null == context) throw new ABIRSNContextNullError(NULL_CONTEXT_ERR_MSG);
         return nameToString(context, name);
     }
 
@@ -97,7 +97,7 @@ public class AbiRixSerializationProviderImpl implements ISerializationProvider {
      */
     @Nullable
     public String error() throws SerializationProviderError {
-        if (null == context) throw new AbirixContextNullError(NULL_CONTEXT_ERR_MSG);
+        if (null == context) throw new ABIRSNContextNullError(NULL_CONTEXT_ERR_MSG);
         return getError(context);
     }
 
@@ -111,7 +111,7 @@ public class AbiRixSerializationProviderImpl implements ISerializationProvider {
      * @throws SerializeError - A serialization error is thrown if there are any exceptions during the
      * conversion process.
      */
-    public void serialize(@NotNull AbiRixSerializationObject serializationObject)
+    public void serialize(@NotNull ABIRSNSerializationObject serializationObject)
             throws SerializeError {
 
         try {
@@ -188,7 +188,7 @@ public class AbiRixSerializationProviderImpl implements ISerializationProvider {
     public String serializeTransaction(String json) throws SerializeTransactionError {
         try {
             String abi = getAbiJsonString("transaction.abi.json");
-            AbiRixSerializationObject serializationObject = new AbiRixSerializationObject(null,
+            ABIRSNSerializationObject serializationObject = new ABIRSNSerializationObject(null,
                     "", "transaction", abi);
             serializationObject.setJson(json);
             serialize(serializationObject);
@@ -210,7 +210,7 @@ public class AbiRixSerializationProviderImpl implements ISerializationProvider {
     public String serializeAbi(String json) throws SerializeAbiError {
         try {
             String abi = getAbiJsonString("abi.abi.json");
-            AbiRixSerializationObject serializationObject = new AbiRixSerializationObject(null,
+            ABIRSNSerializationObject serializationObject = new ABIRSNSerializationObject(null,
                     "", "abi_def", abi);
             serializationObject.setJson(json);
             serialize(serializationObject);
@@ -230,7 +230,7 @@ public class AbiRixSerializationProviderImpl implements ISerializationProvider {
      * @throws DeserializeError - A deserialization error is thrown if there are any exceptions during the
      * conversion process.
      */
-    public void deserialize(@NotNull AbiRixSerializationObject deserilizationObject) throws DeserializeError {
+    public void deserialize(@NotNull ABIRSNSerializationObject deserilizationObject) throws DeserializeError {
 
         try {
             // refreshContext() will throw an error if it can't create the context so we don't need
@@ -294,7 +294,7 @@ public class AbiRixSerializationProviderImpl implements ISerializationProvider {
     public String deserializeTransaction(String hex) throws DeserializeTransactionError {
         try {
             String abi = getAbiJsonString("transaction.abi.json");
-            AbiRixSerializationObject serializationObject = new AbiRixSerializationObject(null,
+            ABIRSNSerializationObject serializationObject = new ABIRSNSerializationObject(null,
                     "", "transaction", abi);
             serializationObject.setHex(hex);
             deserialize(serializationObject);
@@ -316,7 +316,7 @@ public class AbiRixSerializationProviderImpl implements ISerializationProvider {
     public String deserializeAbi(String hex) throws DeserializeAbiError {
         try {
             String abi = getAbiJsonString("abi.abi.json");
-            AbiRixSerializationObject serializationObject = new AbiRixSerializationObject(null,
+            ABIRSNSerializationObject serializationObject = new ABIRSNSerializationObject(null,
                     "", "abi_def", abi);
             serializationObject.setHex(hex);
             deserialize(serializationObject);
@@ -328,14 +328,14 @@ public class AbiRixSerializationProviderImpl implements ISerializationProvider {
 
     /**
      * Reset the underlying C++ context by destroying and recreating it.  This allows multiple
-     * conversions to be done using the same AbiRixSerializationProviderImpl instance.
+     * conversions to be done using the same ABIRSNSerializationProviderImpl instance.
      * @throws SerializationProviderError - if the context cannot be re-created.
      */
     private void refreshContext() throws SerializationProviderError {
         destroyContext();
         context = create();
         if (null == context) {
-            throw new AbirixContextNullError("Could not create abirix context.");
+            throw new ABIRSNContextNullError("Could not create ABIRSN context.");
         }
     }
 
@@ -351,7 +351,7 @@ public class AbiRixSerializationProviderImpl implements ISerializationProvider {
 
         String abiString;
 
-        Map<String, String>jsonMap = AbiRixJson.abiRixJsonMap;
+        Map<String, String>jsonMap = ABIRSNJson.ABIRSNJsonMap;
         if (jsonMap.containsKey(abi)) {
             abiString = jsonMap.get(abi);
         } else {

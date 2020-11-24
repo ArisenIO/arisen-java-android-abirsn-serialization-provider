@@ -39,7 +39,7 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'one.block:arisenjava:0.1.2'
+    implementation 'labs.peeps:arisenjava:0.1.2'
 
     implementation 'org.jetbrains:annotations:17.0.0'
     implementation 'androidx.appcompat:appcompat:1.0.0-beta01'
@@ -49,9 +49,9 @@ dependencies {
 }
 
 
-def libraryGroupId = 'one.block'
-def libraryArtifactId = 'arisenjavaandroidabirixserializationprovider'
-def libraryVersion = '0.1.1'
+def libraryGroupId = 'labs.peeps'
+def libraryArtifactId = 'arisenjavaandroidABIRSNserializationprovider'
+def libraryVersion = '0.0.1'
 
 task androidJavadocs(type: Javadoc) {
     source = android.sourceSets.main.java.srcDirs
@@ -86,13 +86,13 @@ project.afterEvaluate {
                 artifact androidJavadocsJar
                 artifact androidSourcesJar
                 pom {
-                    name = 'ARISEN SDK for Java Android: ABIRIX Serialization Provider'
-                    description = 'ABIRIX Serialization Provider is intended to be used in conjunction with ARISEN SDK for Java as a provider plugin.'
-                    url = 'https://github.com/ARISEN/arisen-java-android-abirix-serialization-provider/'
+                    name = 'ARISEN SDK for Java Android: ABIRSN Serialization Provider'
+                    description = 'ABIRSN Serialization Provider is intended to be used in conjunction with ARISEN SDK for Java as a provider plugin.'
+                    url = 'https://github.com/ARISEN/arisen-java-android-ABIRSN-serialization-provider/'
                     licenses {
                         license {
                             name = 'MIT License'
-                            url = 'https://github.com/ARISEN/arisen-java-android-abirix-serialization-provider/blob/master/LICENSE'
+                            url = 'https://github.com/ARISEN/arisen-java-android-ABIRSN-serialization-provider/blob/master/LICENSE'
                         }
                     }
                     developers {

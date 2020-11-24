@@ -1,4 +1,4 @@
-package one.block.arisenjavaabirixserializationprovider;
+package labs.peeps.arisenjavaABIRSNserializationprovider;
 
 import android.util.Log;
 

@@ -1,4 +1,4 @@
-// copyright defined in abirix/LICENSE.txt
+// copyright defined in ABIRSN/LICENSE.txt
 
 #pragma once
 
@@ -8,19 +8,19 @@
 #include <string>
 #include <string_view>
 
-#include "abirix_ripemd160.hpp"
+#include "ABIRSN_ripemd160.hpp"
 
-#define ABIRIX_NODISCARD [[nodiscard]]
+#define ABIRSN_NODISCARD [[nodiscard]]
 
-namespace abirix {
+namespace ABIRSN {
 
 template <typename State>
-ABIRIX_NODISCARD bool set_error(State& state, std::string error) {
+ABIRSN_NODISCARD bool set_error(State& state, std::string error) {
     state.error = std::move(error);
     return false;
 }
 
-ABIRIX_NODISCARD inline bool set_error(std::string& state, std::string error) {
+ABIRSN_NODISCARD inline bool set_error(std::string& state, std::string error) {
     state = std::move(error);
     return false;
 }
@@ -54,7 +54,7 @@ void negate(std::array<uint8_t, size>& a) {
 }
 
 template <auto size>
-ABIRIX_NODISCARD inline bool decimal_to_binary(std::array<uint8_t, size>& result, std::string& error,
+ABIRSN_NODISCARD inline bool decimal_to_binary(std::array<uint8_t, size>& result, std::string& error,
                                                std::string_view s) {
     memset(result.begin(), 0, result.size());
     for (auto& src_digit : s) {
@@ -73,7 +73,7 @@ ABIRIX_NODISCARD inline bool decimal_to_binary(std::array<uint8_t, size>& result
 }
 
 template <typename T>
-ABIRIX_NODISCARD inline auto decimal_to_binary(T& result, std::string& error, std::string_view s)
+ABIRSN_NODISCARD inline auto decimal_to_binary(T& result, std::string& error, std::string_view s)
     -> std::enable_if_t<std::is_unsigned_v<T>, bool> {
     result = 0;
     if (s.empty())
@@ -92,7 +92,7 @@ ABIRIX_NODISCARD inline auto decimal_to_binary(T& result, std::string& error, st
 }
 
 template <typename T>
-ABIRIX_NODISCARD inline auto decimal_to_binary(T& result, std::string& error, std::string_view s)
+ABIRSN_NODISCARD inline auto decimal_to_binary(T& result, std::string& error, std::string_view s)
     -> std::enable_if_t<std::is_signed_v<T>, bool> {
     bool neg = false;
     if (!s.empty() && s[0] == '-') {
@@ -136,7 +136,7 @@ std::string binary_to_decimal(const std::array<uint8_t, size>& bin) {
 }
 
 template <auto size>
-ABIRIX_NODISCARD inline bool base58_to_binary(std::array<uint8_t, size>& result, std::string& error,
+ABIRSN_NODISCARD inline bool base58_to_binary(std::array<uint8_t, size>& result, std::string& error,
                                               std::string_view s) {
     memset(result.begin(), 0, result.size());
     for (auto& src_digit : s) {
@@ -199,31 +199,31 @@ struct signature {
     std::array<uint8_t, 65> data{};
 };
 
-ABIRIX_NODISCARD inline bool digest_message_ripemd160(std::array<unsigned char, 20>& digest, std::string& error,
+ABIRSN_NODISCARD inline bool digest_message_ripemd160(std::array<unsigned char, 20>& digest, std::string& error,
                                                       const unsigned char* message, size_t message_len) {
-    abirix_ripemd160::ripemd160_state self;
-    abirix_ripemd160::ripemd160_init(&self);
-    abirix_ripemd160::ripemd160_update(&self, message, message_len);
-    if (!abirix_ripemd160::ripemd160_digest(&self, digest.data()))
+    ABIRSN_ripemd160::ripemd160_state self;
+    ABIRSN_ripemd160::ripemd160_init(&self);
+    ABIRSN_ripemd160::ripemd160_update(&self, message, message_len);
+    if (!ABIRSN_ripemd160::ripemd160_digest(&self, digest.data()))
         return set_error(error, "ripemd failed");
     return true;
 }
 
 template <size_t size, int suffix_size>
-ABIRIX_NODISCARD inline bool digest_suffix_ripemd160(std::array<unsigned char, 20>& digest, std::string& error,
+ABIRSN_NODISCARD inline bool digest_suffix_ripemd160(std::array<unsigned char, 20>& digest, std::string& error,
                                                      const std::array<uint8_t, size>& data,
                                                      const char (&suffix)[suffix_size]) {
-    abirix_ripemd160::ripemd160_state self;
-    abirix_ripemd160::ripemd160_init(&self);
-    abirix_ripemd160::ripemd160_update(&self, data.data(), data.size());
-    abirix_ripemd160::ripemd160_update(&self, (uint8_t*)suffix, suffix_size - 1);
-    if (!abirix_ripemd160::ripemd160_digest(&self, digest.data()))
+    ABIRSN_ripemd160::ripemd160_state self;
+    ABIRSN_ripemd160::ripemd160_init(&self);
+    ABIRSN_ripemd160::ripemd160_update(&self, data.data(), data.size());
+    ABIRSN_ripemd160::ripemd160_update(&self, (uint8_t*)suffix, suffix_size - 1);
+    if (!ABIRSN_ripemd160::ripemd160_digest(&self, digest.data()))
         return set_error(error, "ripemd failed");
     return true;
 }
 
 template <typename Key, int suffix_size>
-ABIRIX_NODISCARD bool string_to_key(Key& result, std::string& error, std::string_view s, key_type type,
+ABIRSN_NODISCARD bool string_to_key(Key& result, std::string& error, std::string_view s, key_type type,
                                     const char (&suffix)[suffix_size]) {
     static constexpr auto size = std::tuple_size_v<decltype(Key::data)>;
     std::array<uint8_t, size + 4> whole;
@@ -240,7 +240,7 @@ ABIRIX_NODISCARD bool string_to_key(Key& result, std::string& error, std::string
 }
 
 template <typename Key, int suffix_size>
-ABIRIX_NODISCARD bool key_to_string(std::string& dest, std::string& error, const Key& key,
+ABIRSN_NODISCARD bool key_to_string(std::string& dest, std::string& error, const Key& key,
                                     const char (&suffix)[suffix_size], const char* prefix) {
     static constexpr auto size = std::tuple_size_v<decltype(Key::data)>;
     std::array<unsigned char, 20> ripe_digest;
@@ -253,7 +253,7 @@ ABIRIX_NODISCARD bool key_to_string(std::string& dest, std::string& error, const
     return true;
 }
 
-ABIRIX_NODISCARD inline bool string_to_public_key(public_key& dest, std::string& error, std::string_view s) {
+ABIRSN_NODISCARD inline bool string_to_public_key(public_key& dest, std::string& error, std::string_view s) {
     if (s.size() >= 3 && s.substr(0, 3) == "RIX") {
         std::array<uint8_t, 37> whole;
         if (!base58_to_binary(whole, error, s.substr(3)))
@@ -277,7 +277,7 @@ ABIRIX_NODISCARD inline bool string_to_public_key(public_key& dest, std::string&
     }
 }
 
-ABIRIX_NODISCARD inline bool public_key_to_string(std::string& dest, std::string& error, const public_key& key) {
+ABIRSN_NODISCARD inline bool public_key_to_string(std::string& dest, std::string& error, const public_key& key) {
     if (key.type == key_type::k1) {
         return key_to_string(dest, error, key, "K1", "PUB_K1_");
     } else if (key.type == key_type::r1) {
@@ -287,14 +287,14 @@ ABIRIX_NODISCARD inline bool public_key_to_string(std::string& dest, std::string
     }
 }
 
-ABIRIX_NODISCARD inline bool string_to_private_key(private_key& dest, std::string& error, std::string_view s) {
+ABIRSN_NODISCARD inline bool string_to_private_key(private_key& dest, std::string& error, std::string_view s) {
     if (s.size() >= 7 && s.substr(0, 7) == "PVT_R1_")
         return string_to_key(dest, error, s.substr(7), key_type::r1, "R1");
     else
         return set_error(error, "unrecognized private key format");
 }
 
-ABIRIX_NODISCARD inline bool private_key_to_string(std::string& dest, std::string& error,
+ABIRSN_NODISCARD inline bool private_key_to_string(std::string& dest, std::string& error,
                                                    const private_key& private_key) {
     if (private_key.type == key_type::r1)
         return key_to_string(dest, error, private_key, "R1", "PVT_R1_");
@@ -302,7 +302,7 @@ ABIRIX_NODISCARD inline bool private_key_to_string(std::string& dest, std::strin
         return set_error(error, "unrecognized private key format");
 }
 
-ABIRIX_NODISCARD inline bool string_to_signature(signature& dest, std::string& error, std::string_view s) {
+ABIRSN_NODISCARD inline bool string_to_signature(signature& dest, std::string& error, std::string_view s) {
     if (s.size() >= 7 && s.substr(0, 7) == "SIG_K1_")
         return string_to_key(dest, error, s.substr(7), key_type::k1, "K1");
     else if (s.size() >= 7 && s.substr(0, 7) == "SIG_R1_")
@@ -311,7 +311,7 @@ ABIRIX_NODISCARD inline bool string_to_signature(signature& dest, std::string& e
         return set_error(error, "unrecognized signature format");
 }
 
-ABIRIX_NODISCARD inline bool signature_to_string(std::string& dest, std::string& error, const signature& signature) {
+ABIRSN_NODISCARD inline bool signature_to_string(std::string& dest, std::string& error, const signature& signature) {
     if (signature.type == key_type::k1)
         return key_to_string(dest, error, signature, "K1", "SIG_K1_");
     else if (signature.type == key_type::r1)
@@ -320,4 +320,4 @@ ABIRIX_NODISCARD inline bool signature_to_string(std::string& dest, std::string&
         return set_error(error, "unrecognized signature format");
 }
 
-} // namespace abirix
+} // namespace ABIRSN

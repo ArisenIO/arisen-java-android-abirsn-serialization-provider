@@ -1,4 +1,4 @@
-// copyright defined in abirix/LICENSE.txt
+// copyright defined in ABIRSN/LICENSE.txt
 
 #include "fuzzer.hpp"
 #include <stdio.h>
@@ -28,24 +28,24 @@ extern "C" int LLVMFuzzerTestOneInput(const char* pos, size_t size) {
     if (!abi || !type || !data)
         return 0;
 
-    auto context = abirix_create();
+    auto context = ABIRSN_create();
     bool ok;
     if (header.abi_is_bin)
-        ok = abirix_set_abi_bin(context, header.contract, abi, header.abi_size);
+        ok = ABIRSN_set_abi_bin(context, header.contract, abi, header.abi_size);
     else
-        ok = abirix_set_abi(context, header.contract, abi);
+        ok = ABIRSN_set_abi(context, header.contract, abi);
 
     if (ok) {
         if (header.operation == fuzzer_json_to_bin) {
-            abirix_json_to_bin(context, header.contract, type, data);
-            // printf("%s\n", abirix_get_bin_hex(context));
-            abirix_json_to_bin_reorderable(context, header.contract, type, data);
-            // printf("%s\n", abirix_get_bin_hex(context));
+            ABIRSN_json_to_bin(context, header.contract, type, data);
+            // printf("%s\n", ABIRSN_get_bin_hex(context));
+            ABIRSN_json_to_bin_reorderable(context, header.contract, type, data);
+            // printf("%s\n", ABIRSN_get_bin_hex(context));
         } else {
-            abirix_bin_to_json(context, header.contract, type, data, end - data);
+            ABIRSN_bin_to_json(context, header.contract, type, data, end - data);
         }
     }
 
-    abirix_destroy(context);
+    ABIRSN_destroy(context);
     return 0;
 }

@@ -1,13 +1,13 @@
-package one.block.testarisenjavaabirix;
+package labs.peeps.testarisenjavaABIRSN;
 
 import androidx.test.runner.AndroidJUnit4;
-import one.block.arisenjava.error.serializationProvider.DeserializeAbiError;
-import one.block.arisenjava.error.serializationProvider.DeserializeError;
-import one.block.arisenjava.error.serializationProvider.DeserializeTransactionError;
-import one.block.arisenjava.error.serializationProvider.SerializationProviderError;
-import one.block.arisenjava.error.serializationProvider.SerializeTransactionError;
-import one.block.arisenjava.models.AbiRixSerializationObject;
-import one.block.arisenjavaabirixserializationprovider.AbiRixSerializationProviderImpl;
+import labs.peeps.arisenjava.error.serializationProvider.DeserializeAbiError;
+import labs.peeps.arisenjava.error.serializationProvider.DeserializeError;
+import labs.peeps.arisenjava.error.serializationProvider.DeserializeTransactionError;
+import labs.peeps.arisenjava.error.serializationProvider.SerializationProviderError;
+import labs.peeps.arisenjava.error.serializationProvider.SerializeTransactionError;
+import labs.peeps.arisenjava.models.ABIRSNSerializationObject;
+import labs.peeps.arisenjavaABIRSNserializationprovider.ABIRSNSerializationProviderImpl;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -18,18 +18,18 @@ import static org.junit.Assert.*;
 
 // At this point its not possible to run these as normal unit tests even though the context
 // access to pick up the abi json as resources has been removed.  This is because we are
-// using the NDK to compile the abirix c++ code, which results in shared libraries that need
+// using the NDK to compile the ABIRSN c++ code, which results in shared libraries that need
 // android to run.
 
 @RunWith(AndroidJUnit4.class)
-public class AbiRixSerializationProviderImplInstrumentedTest {
+public class ABIRSNSerializationProviderImplInstrumentedTest {
 
-    private static AbiRixSerializationProviderImpl abirix;
+    private static ABIRSNSerializationProviderImpl ABIRSN;
 
     @BeforeClass
     public static void startSetup() {
         try {
-            abirix = new AbiRixSerializationProviderImpl();
+            ABIRSN = new ABIRSNSerializationProviderImpl();
         } catch (SerializationProviderError serializationProviderError) {
             serializationProviderError.printStackTrace();
             fail();
@@ -38,8 +38,8 @@ public class AbiRixSerializationProviderImplInstrumentedTest {
 
     @AfterClass
     public static void endTearDown() {
-        abirix.destroyContext();
-        abirix = null;
+        ABIRSN.destroyContext();
+        ABIRSN = null;
     }
 
     @Test
@@ -50,7 +50,7 @@ public class AbiRixSerializationProviderImplInstrumentedTest {
         String json = null;
 
         try {
-            json = abirix.deserializeAbi(hex);
+            json = ABIRSN.deserializeAbi(hex);
         } catch (DeserializeAbiError err) {
             err.printStackTrace();
         }
@@ -68,7 +68,7 @@ public class AbiRixSerializationProviderImplInstrumentedTest {
         String json = null;
 
         try {
-            json = abirix.deserializeTransaction(hex);
+            json = ABIRSN.deserializeTransaction(hex);
         } catch (DeserializeTransactionError err) {
             err.printStackTrace();
         }
@@ -87,9 +87,9 @@ public class AbiRixSerializationProviderImplInstrumentedTest {
         String json = null;
 
         try {
-            AbiRixSerializationObject serializationObject = new AbiRixSerializationObject("arisen.token", "transfer", null, abi);
+            ABIRSNSerializationObject serializationObject = new ABIRSNSerializationObject("arisen.token", "transfer", null, abi);
             serializationObject.setHex(hex);
-            abirix.deserialize(serializationObject);
+            ABIRSN.deserialize(serializationObject);
             json = serializationObject.getJson();
         } catch (DeserializeError err) {
             err.printStackTrace();
@@ -138,7 +138,7 @@ public class AbiRixSerializationProviderImplInstrumentedTest {
         String hex = null;
 
         try {
-            hex = abirix.serializeTransaction(json);
+            hex = ABIRSN.serializeTransaction(json);
         } catch (SerializeTransactionError err) {
             err.printStackTrace();
         }
@@ -150,8 +150,8 @@ public class AbiRixSerializationProviderImplInstrumentedTest {
     @Test
     public void testContextError() {
         try {
-            abirix.destroyContext();
-            String err = abirix.error();
+            ABIRSN.destroyContext();
+            String err = ABIRSN.error();
             fail("Should have thrown an error because the context was null.");
         } catch (SerializationProviderError ace) {
 

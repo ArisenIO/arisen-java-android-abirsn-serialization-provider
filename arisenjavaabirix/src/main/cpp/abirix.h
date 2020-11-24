@@ -1,4 +1,4 @@
-// copyright defined in abirix/LICENSE.txt
+// copyright defined in ABIRSN/LICENSE.txt
 
 #pragma once
 
@@ -9,60 +9,60 @@
 extern "C" {
 #endif
 
-typedef struct abirix_context_s abirix_context;
-typedef int abirix_bool;
+typedef struct ABIRSN_context_s ABIRSN_context;
+typedef int ABIRSN_bool;
 
 // Create a context. The context holds all memory allocated by functions in this header. Returns null on failure.
-abirix_context* abirix_create();
+ABIRSN_context* ABIRSN_create();
 
 // Destroy a context.
-void abirix_destroy(abirix_context* context);
+void ABIRSN_destroy(ABIRSN_context* context);
 
 // Get last error. Never returns null. The context owns the returned string.
-const char* abirix_get_error(abirix_context* context);
+const char* ABIRSN_get_error(ABIRSN_context* context);
 
-// Get generated binary. The context owns the returned memory. Functions return null on error; use abirix_get_error to
+// Get generated binary. The context owns the returned memory. Functions return null on error; use ABIRSN_get_error to
 // retrieve error.
-int abirix_get_bin_size(abirix_context* context);
-const char* abirix_get_bin_data(abirix_context* context);
+int ABIRSN_get_bin_size(ABIRSN_context* context);
+const char* ABIRSN_get_bin_data(ABIRSN_context* context);
 
-// Convert generated binary to hex. The context owns the returned string. Returns null on error; use abirix_get_error to
+// Convert generated binary to hex. The context owns the returned string. Returns null on error; use ABIRSN_get_error to
 // retrieve error.
-const char* abirix_get_bin_hex(abirix_context* context);
+const char* ABIRSN_get_bin_hex(ABIRSN_context* context);
 
-// Name conversion. The context owns the returned memory. Functions return null on error; use abirix_get_error to
+// Name conversion. The context owns the returned memory. Functions return null on error; use ABIRSN_get_error to
 // retrieve error.
-uint64_t abirix_string_to_name(abirix_context* context, const char* str);
-const char* abirix_name_to_string(abirix_context* context, uint64_t name);
+uint64_t ABIRSN_string_to_name(ABIRSN_context* context, const char* str);
+const char* ABIRSN_name_to_string(ABIRSN_context* context, uint64_t name);
 
 // Set abi (JSON format). Returns false on error.
-abirix_bool abirix_set_abi(abirix_context* context, uint64_t contract, const char* abi);
+ABIRSN_bool ABIRSN_set_abi(ABIRSN_context* context, uint64_t contract, const char* abi);
 
 // Set abi (binary format). Returns false on error.
-abirix_bool abirix_set_abi_bin(abirix_context* context, uint64_t contract, const char* data, size_t size);
+ABIRSN_bool ABIRSN_set_abi_bin(ABIRSN_context* context, uint64_t contract, const char* data, size_t size);
 
 // Set abi (hex format). Returns false on error.
-abirix_bool abirix_set_abi_hex(abirix_context* context, uint64_t contract, const char* hex);
+ABIRSN_bool ABIRSN_set_abi_hex(ABIRSN_context* context, uint64_t contract, const char* hex);
 
-// Get the type name for an action. The contract owns the returned memory. Returns null on error; use abirix_get_error
+// Get the type name for an action. The contract owns the returned memory. Returns null on error; use ABIRSN_get_error
 // to retrieve error.
-const char* abirix_get_type_for_action(abirix_context* context, uint64_t contract, uint64_t action);
+const char* ABIRSN_get_type_for_action(ABIRSN_context* context, uint64_t contract, uint64_t action);
 
-// Convert json to binary. Use abirix_get_bin_* to retrieve result. Returns false on error.
-abirix_bool abirix_json_to_bin(abirix_context* context, uint64_t contract, const char* type, const char* json);
+// Convert json to binary. Use ABIRSN_get_bin_* to retrieve result. Returns false on error.
+ABIRSN_bool ABIRSN_json_to_bin(ABIRSN_context* context, uint64_t contract, const char* type, const char* json);
 
-// Convert json to binary. Allow json field reordering. Use abirix_get_bin_* to retrieve result. Returns false on error.
-abirix_bool abirix_json_to_bin_reorderable(abirix_context* context, uint64_t contract, const char* type,
+// Convert json to binary. Allow json field reordering. Use ABIRSN_get_bin_* to retrieve result. Returns false on error.
+ABIRSN_bool ABIRSN_json_to_bin_reorderable(ABIRSN_context* context, uint64_t contract, const char* type,
                                            const char* json);
 
-// Convert binary to json. The context owns the returned string. Returns null on error; use abirix_get_error to retrieve
+// Convert binary to json. The context owns the returned string. Returns null on error; use ABIRSN_get_error to retrieve
 // error.
-const char* abirix_bin_to_json(abirix_context* context, uint64_t contract, const char* type, const char* data,
+const char* ABIRSN_bin_to_json(ABIRSN_context* context, uint64_t contract, const char* type, const char* data,
                                size_t size);
 
-// Convert hex to json. The context owns the returned memory. Returns null on error; use abirix_get_error to retrieve
+// Convert hex to json. The context owns the returned memory. Returns null on error; use ABIRSN_get_error to retrieve
 // error.
-const char* abirix_hex_to_json(abirix_context* context, uint64_t contract, const char* type, const char* hex);
+const char* ABIRSN_hex_to_json(ABIRSN_context* context, uint64_t contract, const char* type, const char* hex);
 
 #ifdef __cplusplus
 }

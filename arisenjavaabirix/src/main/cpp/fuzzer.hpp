@@ -1,6 +1,6 @@
 #pragma once
 
-#include "abirix.h"
+#include "ABIRSN.h"
 #include <string.h>
 
 enum fuzzer_operation {

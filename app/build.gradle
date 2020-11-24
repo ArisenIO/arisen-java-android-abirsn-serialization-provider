@@ -5,11 +5,11 @@ android {
 
     defaultConfig {
 
-        applicationId "one.block.testarisenjavaabirix"
+        applicationId "labs.peeps.testarisenjavaABIRSN"
         minSdkVersion 21
         targetSdkVersion 28
         versionCode 1
-        versionName "1.0"
+        versionName "0.0.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
@@ -54,7 +54,7 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.0-alpha4'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-alpha4'
-    implementation project(':arisenjavaabirix')
-    implementation 'one.block:arisenjava:0.1.0'
+    implementation project(':arisenjavaABIRSN')
+    implementation 'labs.peeps:arisenjava:0.1.0'
     
 }

@@ -1,4 +1,4 @@
-package one.block.arisenjavaabirixserializationprovider;
+package labs.peeps.arisenjavaABIRSNserializationprovider;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -8,16 +8,16 @@ import java.util.Map;
  * This class holds the JSON templates for ABI conversion as immutable static Maps.  These are used
  * to serialize/deserialize specific types.
  */
-public class AbiRixJson {
-    public static final Map<String, String> abiRixJsonMap = initAbiRixJsonMap();
+public class ABIRSNJson {
+    public static final Map<String, String> ABIRSNJsonMap = initABIRSNJsonMap();
 
     /**
      * Initialize an immutable static map with the JSON templates for ABI and Transaction
-     * serialization and deserialization.  These are used as inputs to the ABIRIX C++
+     * serialization and deserialization.  These are used as inputs to the ABIRSN C++
      * serialization provider implementation.
      * @return - Immutable map containing the ABI and Transaction JSON serilization/deserialization templates.
      */
-    private static Map<String, String> initAbiRixJsonMap() {
+    private static Map<String, String> initABIRSNJsonMap() {
         Map<String, String> jsonMap = new HashMap<>();
 
         jsonMap.put("abi.abi.json", "{\n" +
